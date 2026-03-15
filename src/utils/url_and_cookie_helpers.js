@@ -3,7 +3,7 @@ export function areTransactionReceiptsDisabled(cookie) {
   return cookie && cookie.value.match(/receipt=N/);
 }
 
-export function isACMSWebsite(url){
+export function isACMSWebsite(url) {
   // Checks if the given URL belongs to ACMS
   return url.toLowerCase().includes('azurewebsites.us');
 }
@@ -18,17 +18,13 @@ export function getCourtFromUrl(url) {
 
   let match;
   // CM/ECF and PACER
-  match = url
-    .toLowerCase()
-    .match(/^\w+:\/\/(ecf|pacer)\.(\w+)(?:\.audio)?\.uscourts\.gov(?:\/.*)?$/);
+  match = url.toLowerCase().match(/^\w+:\/\/(ecf|pacer)\.(\w+)(?:\.audio)?\.uscourts\.gov(?:\/.*)?$/);
   if (match) {
     return match[2];
   }
 
   // ACMS
-  match = url
-    .toLowerCase()
-    .match(/^\w+:\/\/(\w+)-showdoc\.azurewebsites\.us(?:\/.*)?$/);
+  match = url.toLowerCase().match(/^\w+:\/\/(\w+)-showdoc\.azurewebsites\.us(?:\/.*)?$/);
   if (match) {
     return match[1];
   }

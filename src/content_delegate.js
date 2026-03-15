@@ -13,15 +13,7 @@
 //  attachRecapLinkToEligibleDocs
 //  onDownloadAllSubmit
 //  handleZipFilePageView
-let ContentDelegate = function (
-  tabId,
-  url,
-  path,
-  court,
-  pacer_case_id,
-  pacer_doc_id,
-  links
-) {
+let ContentDelegate = function (tabId, url, path, court, pacer_case_id, pacer_doc_id, links) {
   this.tabId = tabId;
   this.url = url;
   this.path = path;
@@ -99,9 +91,7 @@ ContentDelegate.prototype.checkRestrictions = function () {
     // Ideally we target the form <input>, but absent that
     // we just go to the end of the final form.
     // Should we just always go the end of the final form?
-    let target =
-      document.querySelector('form input') ||
-      document.forms[document.forms.length - 1].lastChild;
+    let target = document.querySelector('form input') || document.forms[document.forms.length - 1].lastChild;
 
     // Nested div for horizontal centering.
     target.insertAdjacentHTML(
@@ -127,21 +117,14 @@ ContentDelegate.prototype.checkRestrictions = function () {
 // Use a variety of approaches to get and store pacer_doc_id to pacer_case_id
 // mappings in local storage.
 ContentDelegate.prototype.findAndStorePacerDocIds = async function () {
-
   // Not all pages have a case ID, and there are corner-cases in merged dockets
   // where there are links to documents on another case.
-  let page_pacer_case_id = this.pacer_case_id
-    ? this.pacer_case_id
-    : await getPacerCaseIdFromPacerDocId(this.tabId, this.pacer_doc_id);
+  let page_pacer_case_id = this.pacer_case_id ? this.pacer_case_id : await getPacerCaseIdFromPacerDocId(this.tabId, this.pacer_doc_id);
 
   let docsToCases = {};
 
   // Try getting a mapping from a pacer_doc_id in the URL to a
-  if (
-    this.pacer_doc_id &&
-    page_pacer_case_id &&
-    typeof page_pacer_case_id === 'string'
-  ) {
+  if (this.pacer_doc_id && page_pacer_case_id && typeof page_pacer_case_id === 'string') {
     debug(3, `Z doc ${this.pacer_doc_id} to ${page_pacer_case_id}`);
     docsToCases[this.pacer_doc_id] = page_pacer_case_id;
   }
@@ -185,12 +168,7 @@ ContentDelegate.prototype.findAndStorePacerDocIds = async function () {
 
 // If this is a docket query page, add RECAP email advertisement.
 ContentDelegate.prototype.addRecapEmailAdvertisement = async function () {
-  if (
-    !(
-      PACER.isBlankQueryReportUrl(this.url) ||
-      PACER.isManageAccountPage(this.url)
-    )
-  ) {
+  if (!(PACER.isBlankQueryReportUrl(this.url) || PACER.isManageAccountPage(this.url))) {
     return;
   }
   let form;
@@ -238,11 +216,10 @@ ContentDelegate.prototype.handleDocketQueryUrl = async function () {
     form.appendChild(recapBanner(docketData.results[0]));
     form.appendChild(div);
 
-    if (docketData.results[0].date_last_filing)
-      dateToInput.after(recapAddLatestFilingButton(docketData.results[0]));
+    if (docketData.results[0].date_last_filing) dateToInput.after(recapAddLatestFilingButton(docketData.results[0]));
   } else {
     PACER.handleDocketAvailabilityMessages(docketDataCount);
-  };
+  }
 };
 
 // If this is a docket page, upload it to RECAP.
@@ -272,9 +249,7 @@ ContentDelegate.prototype.handleDocketDisplayPage = async function () {
   // if the content_delegate didn't pull the case Id on initialization,
   // check the page for a lead case dktrpt url.
   const tabStorage = await getItemsFromStorage(this.tabId);
-  this.pacer_case_id = this.pacer_case_id
-    ? this.pacer_case_id
-    : tabStorage.caseId;
+  this.pacer_case_id = this.pacer_case_id ? this.pacer_case_id : tabStorage.caseId;
 
   // If we don't have this.pacer_case_id at this point, punt.
   if (!this.pacer_case_id) return;
@@ -358,11 +333,7 @@ ContentDelegate.prototype.handleAttachmentMenuPage = async function () {
     return;
   }
 
-  if (!this.pacer_case_id)
-    this.pacer_case_id = await getPacerCaseIdFromPacerDocId(
-      this.tabId,
-      this.pacer_doc_id
-    );
+  if (!this.pacer_case_id) this.pacer_case_id = await getPacerCaseIdFromPacerDocId(this.tabId, this.pacer_doc_id);
 
   // If we don't have this.pacer_case_id at this point, punt.
   if (!this.pacer_case_id) return;
@@ -412,9 +383,7 @@ ContentDelegate.prototype.handleiQuerySummaryPage = async function () {
     return;
   }
 
-  let upload_type = PACER.isCaseQueryAdvance()
-    ? 'CASE_QUERY_RESULT_PAGE'
-    : 'IQUERY_PAGE';
+  let upload_type = PACER.isCaseQueryAdvance() ? 'CASE_QUERY_RESULT_PAGE' : 'IQUERY_PAGE';
   const upload = await dispatchBackgroundFetch({
     action: 'upload',
     data: {
@@ -447,13 +416,8 @@ ContentDelegate.prototype.handleSingleDocumentPageCheck = async function () {
     },
   });
   if (!recapLinks.results.length) return;
-  console.info(
-    'RECAP: Got results from API. Processing results to insert link'
-  );
-  let result = recapLinks.results.filter(
-    (doc) => doc.pacer_doc_id === this.pacer_doc_id,
-    this
-  );
+  console.info('RECAP: Got results from API. Processing results to insert link');
+  let result = recapLinks.results.filter((doc) => doc.pacer_doc_id === this.pacer_doc_id, this);
   if (!result.length) return;
 
   insertAvailableDocBanner(result[0].filepath_local, 'form');
@@ -462,10 +426,7 @@ ContentDelegate.prototype.handleSingleDocumentPageCheck = async function () {
 ContentDelegate.prototype.onDocumentViewSubmit = async function (event) {
   // Security check to ensure message is from a PACER website.
   if (!PACER.getCourtFromUrl(event.origin)) {
-    console.warn(
-      'Received message from non PACER origin. This should only ' +
-        'happen when the extension is being abused by a bad actor.'
-    );
+    console.warn('Received message from non PACER origin. This should only ' + 'happen when the extension is being abused by a bad actor.');
     return;
   }
 
@@ -487,17 +448,11 @@ ContentDelegate.prototype.onDocumentViewSubmit = async function (event) {
   let data = new FormData(form);
   const resp = await window.fetch(form.action, {
     method: form.method,
-    body: data
+    body: data,
   });
 
   let requestHandler = handleDocFormResponse.bind(this);
-  requestHandler(
-    resp.headers.get('Content-Type'),
-    await resp.blob(),
-    null,
-    previousPageHtml,
-    pdfData
-  );
+  requestHandler(resp.headers.get('Content-Type'), await resp.blob(), null, previousPageHtml, pdfData);
 };
 
 // Given the HTML for a page with an <iframe> in it, downloads the PDF
@@ -506,23 +461,9 @@ ContentDelegate.prototype.onDocumentViewSubmit = async function (event) {
 //
 // The documentElement is provided via dependency injection so that it
 // can be properly mocked in tests.
-ContentDelegate.prototype.showPdfPage = async function (
-  html,
-  previousPageHtml,
-  document_number,
-  attachment_number,
-  docket_number
-) {
+ContentDelegate.prototype.showPdfPage = async function (html, previousPageHtml, document_number, attachment_number, docket_number) {
   let helperMethod = showAndUploadPdf.bind(this);
-  await helperMethod(
-    html,
-    previousPageHtml,
-    document_number,
-    attachment_number,
-    docket_number,
-    this.pacer_doc_id,
-    this.restricted
-  );
+  await helperMethod(html, previousPageHtml, document_number, attachment_number, docket_number, this.pacer_doc_id, this.restricted);
 };
 
 // If this page offers a single document, intercept navigation to the document
@@ -546,7 +487,7 @@ ContentDelegate.prototype.handleSingleDocumentPageView = async function () {
       // Adds a 'clicked' attribute to the button as a flag for the background
       // service. This attribute indicates that the user specifically clicked
       // this custom button, triggering the upload process.
-      button.setAttribute('clicked','');
+      button.setAttribute('clicked', '');
       let spinner = document.getElementById('recap-button-spinner');
       if (spinner) spinner.classList.remove('recap-btn-spinner-hidden');
 
@@ -562,20 +503,14 @@ ContentDelegate.prototype.handleSingleDocumentPageView = async function () {
 
   // When we receive the message from the above submit method, submit the form
   // via XHR so we can get the document before the browser does.
-  window.addEventListener(
-    'message',
-    this.onDocumentViewSubmit.bind(this),
-    false
-  );
+  window.addEventListener('message', this.onDocumentViewSubmit.bind(this), false);
 };
 
 // Check every link in the document to see if there is a free RECAP document
 // available. If there is, put a link with a RECAP icon.
 ContentDelegate.prototype.attachRecapLinkToEligibleDocs = async function () {
   let linkCount = this.pacer_doc_ids.length;
-  console.info(
-    'RECAP: Attaching links to all eligible documents ' + `(${linkCount} found)`
-  );
+  console.info('RECAP: Attaching links to all eligible documents ' + `(${linkCount} found)`);
   if (linkCount === 0) return;
 
   // Ask the server whether any of these documents are available from RECAP.
@@ -590,10 +525,7 @@ ContentDelegate.prototype.attachRecapLinkToEligibleDocs = async function () {
   // return if there are no results
   if (!recapLinks) return;
 
-  console.info(
-    'RECAP: Got results from API. Processing results to attach links and ' +
-      'icons where appropriate.'
-  );
+  console.info('RECAP: Got results from API. Processing results to attach links and ' + 'icons where appropriate.');
   for (let i = 0; i < this.links.length; i++) {
     let pacer_doc_id = $(this.links[i]).data('pacer_doc_id');
     if (!pacer_doc_id) continue;
@@ -633,9 +565,7 @@ ContentDelegate.prototype.onDownloadAllSubmit = async function (event) {
       return frames[0].src;
     }
     // Try to extract the PDF URL from the HTML
-    const showTempURL = html.match(
-      new RegExp(String.raw`/cgi-bin/show_temp\.pl\?.*`)
-    );
+    const showTempURL = html.match(new RegExp(String.raw`/cgi-bin/show_temp\.pl\?.*`));
     if (!showTempURL) {
       return null;
     }
@@ -656,9 +586,7 @@ ContentDelegate.prototype.onDownloadAllSubmit = async function (event) {
   // helper function - returns filename based on user preferences
   const generateFileName = (options, pacerCaseId) => {
     if (options.ia_style_filenames) {
-      return ['gov', 'uscourts', this.court, pacerCaseId || 'unknown-case-id']
-        .join('.')
-        .concat('.zip');
+      return ['gov', 'uscourts', this.court, pacerCaseId || 'unknown-case-id'].join('.').concat('.zip');
     } else if (options.lawyer_style_filenames) {
       const firstTable = document.getElementsByTagName('table')[0];
       // The download page's tables typically display transaction details.
@@ -676,15 +604,13 @@ ContentDelegate.prototype.onDownloadAllSubmit = async function (event) {
       const firstTableRows = firstTable.querySelectorAll('tr');
       // Remove rows from the querySelectorAll result that have no visible
       // content.
-      const rowsWithContent = Array.from(firstTableRows).filter((row) =>
-        row.hasChildNodes()
-      );
-      const lastRow = rowsWithContent[rowsWithContent.length -1];
+      const rowsWithContent = Array.from(firstTableRows).filter((row) => row.hasChildNodes());
+      const lastRow = rowsWithContent[rowsWithContent.length - 1];
       let matchedRow;
       // Find the row containing the Description and Case Number. If the last
       // row contains the billing message for documents exceeding 30 pages,
       // adjusts the index accordingly.
-      if (lastRow.innerHTML.includes('You will only be billed for 30 pages')){
+      if (lastRow.innerHTML.includes('You will only be billed for 30 pages')) {
         matchedRow = rowsWithContent[rowsWithContent.length - 3];
       } else {
         matchedRow = rowsWithContent[rowsWithContent.length - 2];
@@ -692,9 +618,7 @@ ContentDelegate.prototype.onDownloadAllSubmit = async function (event) {
       const cells = matchedRow.querySelectorAll('td');
       const document_number = cells[0].innerText.match(/\d+(?=\-)/)[0];
       const docket_number = cells[1].innerText;
-      return [PACER.COURT_ABBREVS[this.court], docket_number, document_number]
-        .join('_')
-        .concat('.zip');
+      return [PACER.COURT_ABBREVS[this.court], docket_number, document_number].join('_').concat('.zip');
     }
   };
 
@@ -708,12 +632,7 @@ ContentDelegate.prototype.onDownloadAllSubmit = async function (event) {
   // tell the user to wait
   $('body').css('cursor', 'wait');
 
-  const browserSpecificFetch =
-    navigator.userAgent.indexOf('Safari') +
-      navigator.userAgent.indexOf('Chrome') <
-    0
-      ? fetch
-      : window.fetch;
+  const browserSpecificFetch = navigator.userAgent.indexOf('Safari') + navigator.userAgent.indexOf('Chrome') < 0 ? fetch : window.fetch;
   const options = await getItemsFromStorage('options');
   const pacerCaseId = event.data.id.match(/caseid=(\d*)/)[1];
   const filename = generateFileName(options, pacerCaseId);
@@ -737,9 +656,7 @@ ContentDelegate.prototype.onDownloadAllSubmit = async function (event) {
   mainDiv.append(loadingMessageWrapper);
 
   // fetch the html page which contains the <iframe> link to the zip document.
-  const htmlPage = await browserSpecificFetch(event.data.id).then((res) =>
-    res.text()
-  );
+  const htmlPage = await browserSpecificFetch(event.data.id).then((res) => res.text());
   const zipUrl = extractUrl(htmlPage);
   //download zip file and save it to chrome storage
   const blob = await fetch(zipUrl).then((res) => res.blob());
@@ -805,9 +722,7 @@ ContentDelegate.prototype.handleZipFilePageView = function () {
   // extract the url from the onclick attribute from one of the two
   // "Download Documents" buttons
   const inputs = [...document.getElementsByTagName('input')];
-  const targetInputs = inputs.filter(
-    (input) => input.type === 'button' && input.value === 'Download Documents'
-  );
+  const targetInputs = inputs.filter((input) => input.type === 'button' && input.value === 'Download Documents');
   const url = targetInputs[0]
     .getAttribute('onclick')
     .replace(/p.*\//, '') // remove parent.location='/cgi-bin/
@@ -821,9 +736,7 @@ ContentDelegate.prototype.handleZipFilePageView = function () {
 
   // imperatively manipulate hte dom elements without injecting a script
   if (PACER.hasFilingCookie(document.cookie)) {
-    const inputs = [
-      ...document.querySelectorAll("form > input[type='button']"),
-    ];
+    const inputs = [...document.querySelectorAll("form > input[type='button']")];
     inputs.map((input) => {
       let button = createRecapButtonForFilers('Download and RECAP Documents');
       button.addEventListener('click', (event) => {
@@ -883,9 +796,7 @@ ContentDelegate.prototype.handleCombinedPDFView = async function () {
 
   // Manipulate the dom elements without injecting a script
   if (PACER.hasFilingCookie(document.cookie)) {
-    const inputs = [
-      ...document.querySelectorAll("form > input[type='button']"),
-    ];
+    const inputs = [...document.querySelectorAll("form > input[type='button']")];
     inputs.map((input) => {
       let button = createRecapButtonForFilers('Download and RECAP Document');
       let spinner = createRecapSpinner();
@@ -926,11 +837,7 @@ ContentDelegate.prototype.handleCombinedPDFView = async function () {
   // via fetch so we can get the document before the browser does.
   window.addEventListener('message', this.onDownloadSubmit.bind(this));
 
-  this.pacer_doc_id = await checkSingleDocInCombinedPDFPage(
-    this.tabId,
-    this.court,
-    this.pacer_doc_id
-  );
+  this.pacer_doc_id = await checkSingleDocInCombinedPDFPage(this.tabId, this.court, this.pacer_doc_id);
 };
 
 ContentDelegate.prototype.onDownloadSubmit = async function (event) {
@@ -947,33 +854,20 @@ ContentDelegate.prototype.onDownloadSubmit = async function (event) {
   let previousPageHtml = copyPDFDocumentPage();
   let pdfData = PACER.parseDataFromReceipt();
 
-  const browserSpecificFetch =
-    navigator.userAgent.indexOf('Safari') +
-      navigator.userAgent.indexOf('Chrome') <
-    0
-      ? fetch
-      : window.fetch;
+  const browserSpecificFetch = navigator.userAgent.indexOf('Safari') + navigator.userAgent.indexOf('Chrome') < 0 ? fetch : window.fetch;
 
   const documentRequest = await browserSpecificFetch(event.data.id);
   let documentBlob = await documentRequest.blob();
 
   let requestHandler = handleDocFormResponse.bind(this);
-  requestHandler(
-    documentRequest.headers.get('Content-Type'),
-    documentBlob,
-    null,
-    previousPageHtml,
-    pdfData
-  );
+  requestHandler(documentRequest.headers.get('Content-Type'), documentBlob, null, previousPageHtml, pdfData);
 };
 
 ContentDelegate.prototype.handleClaimsPageView = async function () {
   // return if not a claims register page
   if (!PACER.isClaimsRegisterPage(this.url, document)) return;
 
-  const pacerCaseId = this.pacer_case_id
-    ? this.pacer_case_id
-    : PACER.getCaseIdFromClaimsPage(document);
+  const pacerCaseId = this.pacer_case_id ? this.pacer_case_id : PACER.getCaseIdFromClaimsPage(document);
 
   // render the page as a string and upload it to recap
   const upload = await dispatchBackgroundFetch({
@@ -985,7 +879,7 @@ ContentDelegate.prototype.handleClaimsPageView = async function () {
       html: document.documentElement.innerHTML,
     },
   });
-  if (upload.error){
+  if (upload.error) {
     console.error('Page not uploaded to the public RECAP archive.');
     return;
   }

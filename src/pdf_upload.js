@@ -21,14 +21,9 @@ const copyPDFDocumentPage = () => {
   return previousPageHtml;
 };
 
-const downloadDataFromIframe = async(match, tabId) => {
+const downloadDataFromIframe = async (match, tabId) => {
   // Download the file from the <iframe> URL.
-  const browserSpecificFetch =
-    navigator.userAgent.indexOf('Safari') +
-      navigator.userAgent.indexOf('Chrome') <
-    0
-      ? fetch
-      : window.fetch;
+  const browserSpecificFetch = navigator.userAgent.indexOf('Safari') + navigator.userAgent.indexOf('Chrome') < 0 ? fetch : window.fetch;
   const blob = await browserSpecificFetch(match[2]).then((res) => res.blob());
   const fileType = blob.type;
   // Allow only specific file types (e.g., PDF) to be stored in the tab storage.
@@ -43,33 +38,14 @@ const downloadDataFromIframe = async(match, tabId) => {
   return blob;
 };
 
-const generateFileName = (
-  options,
-  court,
-  pacer_case_id,
-  docket_number,
-  document_number,
-  attachment_number
-) => {
+const generateFileName = (options, court, pacer_case_id, docket_number, document_number, attachment_number) => {
   // Computes a name for the file using the configuration from RECAP options
   let filename, pieces;
   if (options.ia_style_filenames) {
-    pieces = [
-      'gov',
-      'uscourts',
-      court,
-      pacer_case_id || 'unknown-case-id',
-      document_number || '0',
-      attachment_number || '0',
-    ];
+    pieces = ['gov', 'uscourts', court, pacer_case_id || 'unknown-case-id', document_number || '0', attachment_number || '0'];
     filename = `${pieces.join('.')}.pdf`;
   } else if (options.lawyer_style_filenames) {
-    pieces = [
-      PACER.COURT_ABBREVS[court],
-      docket_number || '0',
-      document_number || '0',
-      attachment_number || '0',
-    ];
+    pieces = [PACER.COURT_ABBREVS[court], docket_number || '0', document_number || '0', attachment_number || '0'];
     filename = `${pieces.join('_')}.pdf`;
   }
   return filename;
@@ -84,10 +60,7 @@ const displayPDFOrSaveIt = (options, filename, match, blob, blobUrl) => {
   // display the PDF in the provided <iframe>, or, if external_pdf is set,
   // save it using FileSaver.js's saveAs().
   let external_pdf = options.external_pdf;
-  if (
-    navigator.userAgent.indexOf('Chrome') >= 0 &&
-    !navigator.plugins.namedItem('Chrome PDF Viewer')
-  ) {
+  if (navigator.userAgent.indexOf('Chrome') >= 0 && !navigator.plugins.namedItem('Chrome PDF Viewer')) {
     // We are in Google Chrome, and the built-in PDF Viewer has been disabled.
     // So we autodetect and force external_pdf true for proper filenames.
     external_pdf = true;
@@ -111,26 +84,14 @@ const displayPDFOrSaveIt = (options, filename, match, blob, blobUrl) => {
   }
 };
 
-const handleDocFormResponse = function (
-  type,
-  ab,
-  xhr,
-  previousPageHtml,
-  dataFromReceipt
-) {
+const handleDocFormResponse = function (type, ab, xhr, previousPageHtml, dataFromReceipt) {
   // If we got a PDF, we wrap it in a simple HTML page.  This lets us treat
   // both cases uniformly: either way we have an HTML page with an <iframe>
   // in it, which is handled by showPdfPage.
   if (type === 'application/pdf') {
     // canb and ca9 return PDFs and trigger this code path.
     let html = PACER.makeFullPageIFrame(URL.createObjectURL(ab));
-    this.showPdfPage(
-      html,
-      previousPageHtml,
-      dataFromReceipt.doc_number,
-      dataFromReceipt.att_number,
-      dataFromReceipt.docket_number
-    );
+    this.showPdfPage(html, previousPageHtml, dataFromReceipt.doc_number, dataFromReceipt.att_number, dataFromReceipt.docket_number);
   } else {
     const reader = new FileReader();
     reader.onload = function () {
@@ -138,20 +99,12 @@ const handleDocFormResponse = function (
       // check if we have an HTML page which redirects the user to the PDF
       // this was first display by the Northern District of Georgia
       // https://github.com/freelawproject/recap/issues/277
-      const redirectResult = Array.from(
-        html.matchAll(/window\.location\s*=\s*["']([^"']+)["'];?/g)
-      );
+      const redirectResult = Array.from(html.matchAll(/window\.location\s*=\s*["']([^"']+)["'];?/g));
       if (redirectResult.length > 0) {
         const url = redirectResult[0][1];
         html = PACER.makeFullPageIFrame(url);
       }
-      this.showPdfPage(
-        html,
-        previousPageHtml,
-        dataFromReceipt.doc_number,
-        dataFromReceipt.att_number,
-        dataFromReceipt.docket_number
-      );
+      this.showPdfPage(html, previousPageHtml, dataFromReceipt.doc_number, dataFromReceipt.att_number, dataFromReceipt.docket_number);
     }.bind(this);
     reader.readAsText(ab); // convert blob to HTML text
   }
@@ -216,36 +169,20 @@ const showAndUploadPdf = async function (
   history.replaceState({ content: previousPageHtml }, '');
 
   let blob = await downloadDataFromIframe(match, this.tabId);
-  if (!blob) return document.documentElement.innerHTML = html_elements;
+  if (!blob) return (document.documentElement.innerHTML = html_elements);
   let blobUrl = URL.createObjectURL(blob);
   let pacer_case_id;
 
   if (attachment_number && PACER.isAppellateCourt(this.court)) {
-    pacer_case_id = this.pacer_case_id
-      ? this.pacer_case_id
-      : await APPELLATE.getCaseId(
-          this.tabId,
-          this.queryParameters,
-          pacer_doc_id
-        );
+    pacer_case_id = this.pacer_case_id ? this.pacer_case_id : await APPELLATE.getCaseId(this.tabId, this.queryParameters, pacer_doc_id);
   } else {
-    pacer_case_id = this.pacer_case_id
-      ? this.pacer_case_id
-      : await getPacerCaseIdFromPacerDocId(this.tabId, pacer_doc_id);
+    pacer_case_id = this.pacer_case_id ? this.pacer_case_id : await getPacerCaseIdFromPacerDocId(this.tabId, pacer_doc_id);
   }
 
-  let filename = generateFileName(
-    options,
-    this.court,
-    pacer_case_id,
-    docket_number,
-    document_number,
-    attachment_number
-  );
+  let filename = generateFileName(options, this.court, pacer_case_id, docket_number, document_number, attachment_number);
   displayPDFOrSaveIt(options, filename, match, blob, blobUrl);
 
-  if (!options['recap_enabled'] || restricted)
-    return console.info('RECAP: Not uploading PDF. RECAP is disabled.');
+  if (!options['recap_enabled'] || restricted) return console.info('RECAP: Not uploading PDF. RECAP is disabled.');
 
   // If we have the pacer_case_id, upload the file to RECAP.
   // We can't pass an ArrayBuffer directly to the background
@@ -258,8 +195,7 @@ const showAndUploadPdf = async function (
     upload_type: 'PDF',
     document: true,
   };
-  if (attachment_number && attachment_number !== '0')
-    body['attachment_number'] = attachment_number;
+  if (attachment_number && attachment_number !== '0') body['attachment_number'] = attachment_number;
   if (this.acmsDocumentGuid) body['acms_document_guid'] = this.acmsDocumentGuid;
 
   const upload = await dispatchBackgroundFetch({

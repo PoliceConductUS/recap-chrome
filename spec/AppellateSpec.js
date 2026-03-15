@@ -1,8 +1,6 @@
 describe('The Appellate module', function () {
-  const nonQueryStringUrl =
-    'https://ecf.ca9.uscourts.gov/n/beam/servlet/TransportRoom';
-  const caseSummaryPage =
-    'https://ecf.ca9.uscourts.gov/n/beam/servlet/TransportRoom?servlet=CaseSummary.jsp&caseNum=20-15019';
+  const nonQueryStringUrl = 'https://ecf.ca9.uscourts.gov/n/beam/servlet/TransportRoom';
+  const caseSummaryPage = 'https://ecf.ca9.uscourts.gov/n/beam/servlet/TransportRoom?servlet=CaseSummary.jsp&caseNum=20-15019';
   const noDocumentLinks = [
     'TransportRoom?servlet=CaseSearch.jsp',
     'http://www.ca9.uscourts.gov/calendar/',
@@ -20,12 +18,8 @@ describe('The Appellate module', function () {
       dlsId: '009131956734',
     },
   ];
-  const searchParamsWithCaseId = new URLSearchParams(
-    'servlet=DocketReportFilter.jsp&caseId=318547'
-  );
-  const searchParamsWithoutCaseId = new URLSearchParams(
-    'servlet=DocketReportFilter.jsp'
-  );
+  const searchParamsWithCaseId = new URLSearchParams('servlet=DocketReportFilter.jsp&caseId=318547');
+  const searchParamsWithoutCaseId = new URLSearchParams('servlet=DocketReportFilter.jsp');
 
   const showDocURLs = [
     {
@@ -52,12 +46,8 @@ describe('The Appellate module', function () {
 
   describe('getQueryParameters', function () {
     it('returns URLSearchParams interface', function () {
-      expect(APPELLATE.getQueryParameters(nonQueryStringUrl)).toBeInstanceOf(
-        URLSearchParams
-      );
-      expect(APPELLATE.getQueryParameters(caseSummaryPage)).toBeInstanceOf(
-        URLSearchParams
-      );
+      expect(APPELLATE.getQueryParameters(nonQueryStringUrl)).toBeInstanceOf(URLSearchParams);
+      expect(APPELLATE.getQueryParameters(caseSummaryPage)).toBeInstanceOf(URLSearchParams);
     });
   });
 
@@ -72,27 +62,21 @@ describe('The Appellate module', function () {
 
   describe('parseReceiptPageTitle', function () {
     it('parses title from download page', function () {
-      let titleData = APPELLATE.parseReceiptPageTitle(
-        'Document: PDF Document (Case: 22-11187, Document: 49)'
-      );
+      let titleData = APPELLATE.parseReceiptPageTitle('Document: PDF Document (Case: 22-11187, Document: 49)');
       expect(titleData.docket_number).toBe('22-11187');
       expect(titleData.doc_number).toBe('49');
       expect(titleData.att_number).toBeNull();
     });
 
     it('parses title with attachment number from download page', function () {
-      let titleData = APPELLATE.parseReceiptPageTitle(
-        'Document: PDF Document (Case: 22-11187, Document: 43-1)'
-      );
+      let titleData = APPELLATE.parseReceiptPageTitle('Document: PDF Document (Case: 22-11187, Document: 43-1)');
       expect(titleData.docket_number).toBe('22-11187');
       expect(titleData.doc_number).toBe('43');
       expect(titleData.att_number).toBe('1');
     });
 
     it('parses title from ACMS download page', function () {
-      let titleData = APPELLATE.parseReceiptPageTitle(
-        'Document: PDF Document (Case: 23-2487, Document: 3.1)'
-      );
+      let titleData = APPELLATE.parseReceiptPageTitle('Document: PDF Document (Case: 23-2487, Document: 3.1)');
       expect(titleData.docket_number).toBe('23-2487');
       expect(titleData.doc_number).toBe('3');
       expect(titleData.att_number).toBe('1');
@@ -107,13 +91,9 @@ describe('The Appellate module', function () {
         input.setAttribute('name', 'servlet');
         input.setAttribute('value', 'CaseSelectionTable.jsp');
         document.body.appendChild(input);
-        document.querySelector = jasmine
-          .createSpy('querySelector')
-          .and.callFake((query) => {
-            return document.querySelectorAll(query).length
-              ? document.querySelectorAll(query)[0]
-              : null;
-          });
+        document.querySelector = jasmine.createSpy('querySelector').and.callFake((query) => {
+          return document.querySelectorAll(query).length ? document.querySelectorAll(query)[0] : null;
+        });
       });
 
       it('returns the servlet parameter', function () {
@@ -140,19 +120,13 @@ describe('The Appellate module', function () {
         input.setAttribute('name', 'caseId');
         input.setAttribute('value', '318457');
         document.body.appendChild(input);
-        document.querySelector = jasmine
-          .createSpy('querySelector')
-          .and.callFake((query) => {
-            return document.querySelectorAll(query).length
-              ? document.querySelectorAll(query)[0]
-              : null;
-          });
+        document.querySelector = jasmine.createSpy('querySelector').and.callFake((query) => {
+          return document.querySelectorAll(query).length ? document.querySelectorAll(query)[0] : null;
+        });
       });
 
       it('returns the caseId value', async function () {
-        expect(
-          await APPELLATE.getCaseId('1234', searchParamsWithoutCaseId)
-        ).toBe('318457');
+        expect(await APPELLATE.getCaseId('1234', searchParamsWithoutCaseId)).toBe('318457');
       });
     });
 
@@ -174,22 +148,16 @@ describe('The Appellate module', function () {
       });
 
       it('returns undefined', async function () {
-        expect(
-          await APPELLATE.getCaseId('1234', searchParamsWithoutCaseId)
-        ).toBeUndefined();
+        expect(await APPELLATE.getCaseId('1234', searchParamsWithoutCaseId)).toBeUndefined();
       });
     });
   });
 
   describe('isAttachmentPage', function () {
     beforeEach(() => {
-      document.querySelector = jasmine
-        .createSpy('querySelector')
-        .and.callFake((query) => {
-          return document.querySelectorAll(query).length
-            ? document.querySelectorAll(query)[0]
-            : null;
-        });
+      document.querySelector = jasmine.createSpy('querySelector').and.callFake((query) => {
+        return document.querySelectorAll(query).length ? document.querySelectorAll(query)[0] : null;
+      });
     });
 
     describe('for pages with matching format', function () {
@@ -228,11 +196,7 @@ describe('The Appellate module', function () {
 
   describe('findDocLinksFromAnchors', function () {
     it('returns empty array for empty input', function () {
-      let { links } = APPELLATE.findDocLinksFromAnchors(
-        [],
-        '3',
-        new URLSearchParams('docNum=30')
-      );
+      let { links } = APPELLATE.findDocLinksFromAnchors([], '3', new URLSearchParams('docNum=30'));
       expect(links.length).toBe(0);
     });
 
@@ -257,11 +221,7 @@ describe('The Appellate module', function () {
 
         it('returns empty array', function () {
           let anchors = document.querySelectorAll('#no_links > a');
-          let { links, _ } = APPELLATE.findDocLinksFromAnchors(
-            anchors,
-            '3',
-            new URLSearchParams('docNum=30')
-          );
+          let { links, _ } = APPELLATE.findDocLinksFromAnchors(anchors, '3', new URLSearchParams('docNum=30'));
           expect(links.length).toBe(0);
         });
       });
@@ -288,12 +248,7 @@ describe('The Appellate module', function () {
         it('returns array with doc_ids', function () {
           let anchors = document.getElementsByTagName('a');
           console.log(anchors);
-          let { links, _ } = APPELLATE.findDocLinksFromAnchors(
-            anchors,
-            '3',
-            new URLSearchParams({ recapDocNum: '30' }),
-            '20-15019'
-          );
+          let { links, _ } = APPELLATE.findDocLinksFromAnchors(anchors, '3', new URLSearchParams({ recapDocNum: '30' }), '20-15019');
           expect(links.length).toBe(2);
           expect(links).toEqual(['009031927529', '009031956734']);
 
@@ -311,9 +266,7 @@ describe('The Appellate module', function () {
 
   describe('getCaseIdFromCaseSelection', function () {
     beforeEach(function () {
-      document.getElementById = jasmine
-        .createSpy('getElementById')
-        .and.callFake((id) => document.querySelectorAll(`#${id}`)[0]);
+      document.getElementById = jasmine.createSpy('getElementById').and.callFake((id) => document.querySelectorAll(`#${id}`)[0]);
     });
 
     describe('for documents which have non-matching format', function () {
@@ -374,16 +327,14 @@ describe('The Appellate module', function () {
         let td = document.createElement('td');
 
         let caseSummaryAnchor = document.createElement('a');
-        caseSummaryAnchor.href =
-          'TransportRoom?servlet=CaseSummary.jsp&caseNum=20-15019&incOrigDkt=Y&incDktEntries=Y';
+        caseSummaryAnchor.href = 'TransportRoom?servlet=CaseSummary.jsp&caseNum=20-15019&incOrigDkt=Y&incDktEntries=Y';
 
         let caseQueryAnchor = document.createElement('a');
         caseQueryAnchor.href =
           'TransportRoom?servlet=CaseQuery.jsp&cnthd=1537139545&caseid=318547&csnum1=20-15019&shorttitle=The+Bank+of+New+York+Mellon+v.+SFR+Investments+Pool+1%2C+LLC%2C+et+al';
 
         let originationCaseAnchor = document.createElement('a');
-        originationCaseAnchor.href =
-          'https://ecf.nvd.uscourts.gov/cgi-bin/DktRpt.pl?caseNumber=2:16-cv-01129-RFB-DJA';
+        originationCaseAnchor.href = 'https://ecf.nvd.uscourts.gov/cgi-bin/DktRpt.pl?caseNumber=2:16-cv-01129-RFB-DJA';
 
         td.appendChild(caseSummaryAnchor);
         td.appendChild(caseQueryAnchor);

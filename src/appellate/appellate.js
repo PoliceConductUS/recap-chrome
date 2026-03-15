@@ -15,8 +15,7 @@ let AppellateDelegate = function (tabId, court, url, path, links) {
 
 // Identify regular Appellate pages using the URL and the query string,
 AppellateDelegate.prototype.regularAppellatePageHandler = function () {
-  let targetPage =
-    this.queryParameters.get('servlet') || APPELLATE.getServletFromInputs();
+  let targetPage = this.queryParameters.get('servlet') || APPELLATE.getServletFromInputs();
   switch (targetPage) {
     case 'CaseSummary.jsp':
       this.handleDocketDisplayPage();
@@ -81,10 +80,7 @@ AppellateDelegate.prototype.ACMSPageHandler = function () {
   // we can immediately initialize the docket handler without waiting for
   // HTMX updates. This handles cases where the page loads fully before
   // the extension runs or when navigating back/forward.
-  if (
-    document.getElementById('indexContent') ||
-    document.getElementById('fullDocketContent')
-  ) {
+  if (document.getElementById('indexContent') || document.getElementById('fullDocketContent')) {
     this.handleAcmsDocket();
   }
 
@@ -147,14 +143,10 @@ AppellateDelegate.prototype.handleAcmsAttachmentPage = async function () {
 
     const options = await getItemsFromStorage('options');
     if (!options['recap_enabled']) {
-      return console.info(
-        'RECAP: Not uploading docket json. RECAP is disabled.'
-      );
+      return console.info('RECAP: Not uploading docket json. RECAP is disabled.');
     }
 
-    const docketEntryData = docketEntries.find(
-      (entry) => entry.docketEntryId == entryId
-    );
+    const docketEntryData = docketEntries.find((entry) => entry.docketEntryId == entryId);
     // Remove documents from the docketEntry object and send them
     // separately to avoid nesting document data twice.
     const { docketEntryDocuments, ...docketEntry } = docketEntryData;
@@ -178,10 +170,9 @@ AppellateDelegate.prototype.handleAcmsAttachmentPage = async function () {
       await dispatchBackgroundNotifier({
         action: 'showUpload',
         title: 'Page Upload Failed',
-        message: 'Error: The Attachment page was not uploaded to the public' +
-          'RECAP Archive',
+        message: 'Error: The Attachment page was not uploaded to the public' + 'RECAP Archive',
       });
-    }else{
+    } else {
       history.replaceState({ uploaded: true }, '');
       await dispatchBackgroundNotifier({
         action: 'showUpload',
@@ -189,7 +180,6 @@ AppellateDelegate.prototype.handleAcmsAttachmentPage = async function () {
         message: 'Attachment page uploaded to the public RECAP Archive.',
       });
     }
-
   };
 
   const attachLinkToDocs = async (entryId) => {
@@ -204,9 +194,7 @@ AppellateDelegate.prototype.handleAcmsAttachmentPage = async function () {
     //    each corresponding entry link.
     let caseData = JSON.parse(sessionStorage.recapDocViewModel);
     const { docketEntries } = caseData;
-    const docketEntryData = docketEntries.find(
-      (entry) => entry.docketEntryId == entryId
-    );
+    const docketEntryData = docketEntries.find((entry) => entry.docketEntryId == entryId);
 
     // Scope all DOM queries to the document viewer modal to avoid
     // accidentally matching links elsewhere on the page.
@@ -234,9 +222,7 @@ AppellateDelegate.prototype.handleAcmsAttachmentPage = async function () {
       let doc_guid = result.acms_document_guid;
       // Query the docket entry link using the
       // `data-doc-id` attribute embedded by ACMS.
-      let anchor = document.querySelector(
-        `[data-doc-id="${doc_guid}"]`
-      );
+      let anchor = document.querySelector(`[data-doc-id="${doc_guid}"]`);
 
       // Create the RECAP icon and link to the document.
       let href = `https://storage.courtlistener.com/${result.filepath_local}`;
@@ -275,9 +261,7 @@ AppellateDelegate.prototype.handleAcmsAttachmentPage = async function () {
         let h4 = n.tagName === 'H4' ? n : n.querySelector('h4');
         if (!h4) continue;
 
-        let isAttachmentsTitle = n.textContent
-          .toLowerCase()
-          .includes('documents are attached to this filing');
+        let isAttachmentsTitle = n.textContent.toLowerCase().includes('documents are attached to this filing');
         if (!isAttachmentsTitle) continue;
 
         let entryId = await getDocketEntryId();
@@ -378,11 +362,11 @@ AppellateDelegate.prototype.handleAcmsDocket = async function () {
       },
     });
     let docketDataCount = docketData.results.length;
-    if (docketDataCount == 1){
+    if (docketDataCount == 1) {
       addAlertButtonInRecapAction(this.court, this.pacer_case_id);
       let cl_id = getClIdFromAbsoluteURL(docketData.results[0].absolute_url);
       addSearchDocketInRecapAction(cl_id);
-    } else{
+    } else {
       PACER.handleDocketAvailabilityMessages(docketDataCount);
     }
   };
@@ -432,9 +416,7 @@ AppellateDelegate.prototype.handleAcmsDocket = async function () {
     let docsToEntries = {};
     for (link of this.links) {
       const docketEntryId = link.dataset.docketEntryId;
-      const docketEntryData = docketEntries.find(
-        (entry) => entry.docketEntryId == docketEntryId
-      );
+      const docketEntryData = docketEntries.find((entry) => entry.docketEntryId == docketEntryId);
       if (!docketEntryData) continue;
 
       // add the id to the array of doc ids
@@ -478,11 +460,10 @@ AppellateDelegate.prototype.handleAcmsDocket = async function () {
       let parent_tr = anchor.closest(`tr[data-docket-entry-id="${doc_id}"]`);
 
       // Within that row, locate the span that contains the document links
-      const parent_span = parent_tr.querySelector("span.document-controls");
+      const parent_span = parent_tr.querySelector('span.document-controls');
 
       // Append the generated RECAP element to the controls area
       parent_span.appendChild(recap_div[0]);
-
     }
     let spinner = document.getElementById('recap-button-spinner');
     if (spinner) spinner.classList.add('recap-btn-spinner-hidden');
@@ -501,16 +482,12 @@ AppellateDelegate.prototype.handleAcmsDocket = async function () {
 };
 
 AppellateDelegate.prototype.handleAcmsDownloadPage = async function () {
-
   const isDownloadConfirmationModal = (modal) => {
     // Checks whether the modal contains a transaction receipt and an
     // "Accept Charges and Retrieve" button, indicating it's a download
     // confirmation page we should handle.
     const text = modal.textContent.toLowerCase();
-    return (
-      text.includes('transaction receipt') &&
-      text.includes('accept charges and retrieve')
-    );
+    return text.includes('transaction receipt') && text.includes('accept charges and retrieve');
   };
 
   const resolveDocumentData = () => {
@@ -530,13 +507,9 @@ AppellateDelegate.prototype.handleAcmsDownloadPage = async function () {
     // 6. Returns an object containing both the matched `docketEntryData` and
     //    `documentData` for use in subsequent processing.
     const { docketEntries } = JSON.parse(sessionStorage.recapDocViewModel);
-    const downloadData = JSON.parse(
-      sessionStorage.getItem('recapDownloadDocumentData')
-    );
+    const downloadData = JSON.parse(sessionStorage.getItem('recapDownloadDocumentData'));
 
-    const docketEntryData = docketEntries.find(
-      (entry) => entry.docketEntryId == downloadData.docketEntryId
-    );
+    const docketEntryData = docketEntries.find((entry) => entry.docketEntryId == downloadData.docketEntryId);
 
     if (!docketEntryData?.docketEntryDocuments?.length) {
       return { docketEntryData: null, documentData: null };
@@ -547,9 +520,7 @@ AppellateDelegate.prototype.handleAcmsDownloadPage = async function () {
     let documentData;
     if (docketEntryData?.docketEntryDocuments?.length > 1) {
       documentData = docketEntryData.docketEntryDocuments.find(
-        (doc) =>
-          doc.docketDocumentDetailsId ==
-          downloadData.docketEntryDocuments[0].docketDocumentDetailsId
+        (doc) => doc.docketDocumentDetailsId == downloadData.docketEntryDocuments[0].docketDocumentDetailsId
       );
     } else {
       documentData = docketEntryData.docketEntryDocuments[0];
@@ -558,10 +529,7 @@ AppellateDelegate.prototype.handleAcmsDownloadPage = async function () {
     return { docketEntryData, documentData };
   };
 
-  const insertRecapBannerIfAvailable = async (
-    docketEntryData,
-    documentData
-  ) => {
+  const insertRecapBannerIfAvailable = async (docketEntryData, documentData) => {
     // Queries the RECAP archive for the document and inserts a download
     // banner if a copy is available.
     const clCourt = PACER.convertToCourtListenerCourt(this.court);
@@ -579,13 +547,9 @@ AppellateDelegate.prototype.handleAcmsDownloadPage = async function () {
       return;
     }
 
-    console.info(
-      'RECAP: Got results from API. Processing results to insert banner'
-    );
+    console.info('RECAP: Got results from API. Processing results to insert banner');
 
-    const result = recapLinks.results.find(
-      (obj) => obj.acms_document_guid === documentData.docketDocumentDetailsId
-    );
+    const result = recapLinks.results.find((obj) => obj.acms_document_guid === documentData.docketDocumentDetailsId);
     if (!result) return;
 
     // Create a centered wrapper div to hold the RECAP banner
@@ -593,9 +557,7 @@ AppellateDelegate.prototype.handleAcmsDownloadPage = async function () {
     wrapper.style.display = 'flex';
     wrapper.style.justifyContent = 'center';
 
-    const target = document.querySelector(
-      '.modal-scrollable-content div.text-center'
-    );
+    const target = document.querySelector('.modal-scrollable-content div.text-center');
     if (!target) return;
     target.appendChild(wrapper);
 
@@ -636,32 +598,21 @@ AppellateDelegate.prototype.handleAcmsDownloadPage = async function () {
     //    - Fetches the PDF as a blob from that URL.
     //    - Passes the blob to handleDocFormResponse for RECAP upload
     //      and display.
-    let {
-      baseApiUrl,
-      caseNumber,
-      docketEntries,
-      authTokenResult,
-      caseSummaryHeadingViewModel,
-    } = JSON.parse(sessionStorage.recapDocViewModel);
+    let { baseApiUrl, caseNumber, docketEntries, authTokenResult, caseSummaryHeadingViewModel } = JSON.parse(
+      sessionStorage.recapDocViewModel
+    );
 
-    let downloadData = JSON.parse(
-      sessionStorage.getItem('recapDownloadDocumentData')
-    );
-    let docketEntryData = docketEntries.find(
-      (entry) => entry.docketEntryId == downloadData.docketEntryId
-    );
+    let downloadData = JSON.parse(sessionStorage.getItem('recapDownloadDocumentData'));
+    let docketEntryData = docketEntries.find((entry) => entry.docketEntryId == downloadData.docketEntryId);
 
     if (!docketEntryData?.docketEntryDocuments?.length) return;
 
-    const pdfFileRequestBody =
-      APPELLATE.createAcmsDocumentRequestBody(downloadData);
+    const pdfFileRequestBody = APPELLATE.createAcmsDocumentRequestBody(downloadData);
 
     let docData = null;
     if (docketEntryData?.docketEntryDocuments?.length > 1) {
       docData = docketEntryData.docketEntryDocuments.find(
-        (doc) =>
-          doc.docketDocumentDetailsId ==
-          downloadData.docketEntryDocuments[0].docketDocumentDetailsId
+        (doc) => doc.docketDocumentDetailsId == downloadData.docketEntryDocuments[0].docketDocumentDetailsId
       );
     } else {
       docData = docketEntryData.docketEntryDocuments[0];
@@ -670,8 +621,7 @@ AppellateDelegate.prototype.handleAcmsDownloadPage = async function () {
     let documentSummary = {
       docket_number: caseNumber,
       doc_number: docketEntryData.entryNumber,
-      att_number:
-        docketEntryData.documentCount > 1 ? docData.documentNumber : null,
+      att_number: docketEntryData.documentCount > 1 ? docData.documentNumber : null,
     };
 
     // Remove element from the page to show loading message
@@ -692,13 +642,7 @@ AppellateDelegate.prototype.handleAcmsDownloadPage = async function () {
     });
     const resp = await window.fetch(pdf_url, { method: 'GET' });
     let requestHandler = handleDocFormResponse.bind(this);
-    requestHandler(
-      resp.headers.get('Content-Type'),
-      await resp.blob(),
-      null,
-      previousPageHtml,
-      documentSummary
-    );
+    requestHandler(resp.headers.get('Content-Type'), await resp.blob(), null, previousPageHtml, documentSummary);
   }
 
   const replaceAcceptChargesButton = (modal) => {
@@ -708,9 +652,7 @@ AppellateDelegate.prototype.handleAcmsDownloadPage = async function () {
     // The original button's event handler fetches a one-time-use PDF URL and
     // navigates to it directly. We need to replace it so we can fetch the PDF
     // as a blob, upload it to the RECAP archive, and then display it.
-    const acceptChargesButton = modal.querySelector(
-      '.modal-fixed-footer button'
-    );
+    const acceptChargesButton = modal.querySelector('.modal-fixed-footer button');
     if (!acceptChargesButton) return;
 
     const parentElement = acceptChargesButton.parentNode;
@@ -722,10 +664,7 @@ AppellateDelegate.prototype.handleAcmsDownloadPage = async function () {
     newButton.classList.add('btn', 'btn-light', 'btn-outline-dark');
     parentElement.appendChild(newButton);
 
-    newButton.addEventListener(
-      'click',
-      startUploadProcess.bind(this)
-    );
+    newButton.addEventListener('click', startUploadProcess.bind(this));
   };
 
   await APPELLATE.storeDocumentDataFromDownloadModal();
@@ -774,12 +713,7 @@ AppellateDelegate.prototype.handleCaseSearchPage = () => {
 AppellateDelegate.prototype.handleDocketReportFilter = async function () {
   if (!this.docketNumber) return;
   let docketNumberCore = PACER.makeDocketNumberCore(this.docketNumber);
-  this.pacer_case_id = await APPELLATE.getCaseId(
-    this.tabId,
-    this.queryParameters,
-    this.docId,
-    this.docketNumber
-  );
+  this.pacer_case_id = await APPELLATE.getCaseId(this.tabId, this.queryParameters, this.docId, this.docketNumber);
 
   let docketData = await dispatchBackgroundFetch({
     action: 'getAvailabilityForDocket',
@@ -797,9 +731,7 @@ AppellateDelegate.prototype.handleDocketReportFilter = async function () {
     if (!this.pacer_case_id) return;
     let recapAlert = document.createElement('div');
     recapAlert.classList.add('recap-banner');
-    recapAlert.appendChild(
-      recapAlertButton(this.court, this.pacer_case_id, true)
-    );
+    recapAlert.appendChild(recapAlertButton(this.court, this.pacer_case_id, true));
     form.after(recapAlert);
   } else {
     PACER.handleDocketAvailabilityMessages(docketDataCount);
@@ -858,9 +790,7 @@ AppellateDelegate.prototype.handleCaseSelectionPage = async function () {
       div.appendChild(recapAlertButton(this.court, this.pacer_case_id, true));
       footer.before(div);
 
-      const rIcon = APPELLATE.makeRButtonForCases(
-        appellateData.results[0].absolute_url
-      );
+      const rIcon = APPELLATE.makeRButtonForCases(appellateData.results[0].absolute_url);
       const appellateLink = anchors[0];
       rIcon.insertAfter(appellateLink);
     } else {
@@ -869,9 +799,7 @@ AppellateDelegate.prototype.handleCaseSelectionPage = async function () {
 
     if (anchors.length == 3) {
       let districtLink = anchors[anchors.length - 1];
-      let districtLinkData = APPELLATE.getDatafromDistrictLinkUrl(
-        districtLink.href
-      );
+      let districtLinkData = APPELLATE.getDatafromDistrictLinkUrl(districtLink.href);
       let districtData = await dispatchBackgroundFetch({
         action: 'getAvailabilityForDocket',
         data: {
@@ -881,9 +809,7 @@ AppellateDelegate.prototype.handleCaseSelectionPage = async function () {
       });
       let districtDataCount = districtData.results.length;
       if (districtDataCount == 1) {
-        const rIcon = APPELLATE.makeRButtonForCases(
-          districtData.results[0].absolute_url
-        );
+        const rIcon = APPELLATE.makeRButtonForCases(districtData.results[0].absolute_url);
         rIcon.insertAfter(districtLink);
       } else {
         PACER.handleDocketAvailabilityMessages(districtDataCount);
@@ -897,9 +823,7 @@ AppellateDelegate.prototype.handleCaseSelectionPage = async function () {
   const options = await getItemsFromStorage('options');
 
   if (!options['recap_enabled']) {
-    console.info(
-      'RECAP: Not uploading case selection page. RECAP is disabled.'
-    );
+    console.info('RECAP: Not uploading case selection page. RECAP is disabled.');
     return;
   }
 
@@ -924,11 +848,7 @@ AppellateDelegate.prototype.handleCaseSelectionPage = async function () {
 
 // Upload the case query page to RECAP
 AppellateDelegate.prototype.handleCaseQueryPage = async function () {
-  this.pacer_case_id = await APPELLATE.getCaseId(
-    this.tabId,
-    this.queryParameters,
-    this.docId
-  );
+  this.pacer_case_id = await APPELLATE.getCaseId(this.tabId, this.queryParameters, this.docId);
 
   if (!this.pacer_case_id) {
     return;
@@ -951,7 +871,7 @@ AppellateDelegate.prototype.handleCaseQueryPage = async function () {
       pacer_case_id: this.pacer_case_id,
       upload_type: 'APPELLATE_CASE_QUERY_PAGE',
       html: document.documentElement.innerHTML,
-    }
+    },
   });
   if (upload.error) return;
 
@@ -978,22 +898,16 @@ AppellateDelegate.prototype.attachRecapLinksToEligibleDocs = async function () {
   }
 
   // filter the links for the documents available on the page
-  let { links, docsToCases, docsToAttachmentNumbers } =
-    APPELLATE.findDocLinksFromAnchors(
-      this.links,
-      this.tabId,
-      this.queryParameters,
-      this.docketNumber
-    );
+  let { links, docsToCases, docsToAttachmentNumbers } = APPELLATE.findDocLinksFromAnchors(
+    this.links,
+    this.tabId,
+    this.queryParameters,
+    this.docketNumber
+  );
 
   this.pacer_case_id = this.pacer_case_id
     ? this.pacer_case_id
-    : await APPELLATE.getCaseId(
-        this.tabId,
-        this.queryParameters,
-        this.docId,
-        this.docketNumber
-      );
+    : await APPELLATE.getCaseId(this.tabId, this.queryParameters, this.docId, this.docketNumber);
 
   if (this.pacer_case_id && this.docId) {
     docsToCases[this.docId] = this.pacer_case_id;
@@ -1009,9 +923,7 @@ AppellateDelegate.prototype.attachRecapLinksToEligibleDocs = async function () {
   });
 
   let linkCount = links.length;
-  console.info(
-    `RECAP: Attaching links to all eligible documents (${linkCount} found)`
-  );
+  console.info(`RECAP: Attaching links to all eligible documents (${linkCount} found)`);
   if (linkCount === 0) return;
 
   let clCourt = PACER.convertToCourtListenerCourt(this.court);
@@ -1025,13 +937,9 @@ AppellateDelegate.prototype.attachRecapLinksToEligibleDocs = async function () {
   });
 
   // return if there are no results
-  if (!recapLinks)
-    return console.error('RECAP: Failed getting availability for dockets.');
+  if (!recapLinks) return console.error('RECAP: Failed getting availability for dockets.');
 
-  console.info(
-    'RECAP: Got results from API. Processing results to attach links and ' +
-      'icons where appropriate.'
-  );
+  console.info('RECAP: Got results from API. Processing results to attach links and ' + 'icons where appropriate.');
   for (let i = 0; i < this.links.length; i++) {
     let pacer_doc_id = this.links[i].dataset.pacerDocId;
     if (!pacer_doc_id) continue;
@@ -1058,16 +966,11 @@ AppellateDelegate.prototype.attachRecapLinksToEligibleDocs = async function () {
     recap_div.insertAfter(this.links[i]);
   }
   let spinner = document.getElementById('recap-button-spinner');
-  if (spinner)spinner.classList.add('recap-btn-spinner-hidden');
+  if (spinner) spinner.classList.add('recap-btn-spinner-hidden');
 };
 
 AppellateDelegate.prototype.handleDocketDisplayPage = async function () {
-  this.pacer_case_id = await APPELLATE.getCaseId(
-    this.tabId,
-    this.queryParameters,
-    this.docId,
-    this.docketNumber
-  );
+  this.pacer_case_id = await APPELLATE.getCaseId(this.tabId, this.queryParameters, this.docId, this.docketNumber);
 
   if (!this.pacer_case_id) return;
 
@@ -1126,11 +1029,7 @@ AppellateDelegate.prototype.handleDocketDisplayPage = async function () {
 };
 
 AppellateDelegate.prototype.handleAttachmentPage = async function () {
-  this.pacer_case_id = await APPELLATE.getCaseId(
-    this.tabId,
-    this.queryParameters,
-    this.docId
-  );
+  this.pacer_case_id = await APPELLATE.getCaseId(this.tabId, this.queryParameters, this.docId);
 
   if (!this.pacer_case_id) return;
 
@@ -1162,9 +1061,7 @@ AppellateDelegate.prototype.handleAttachmentPage = async function () {
 
 AppellateDelegate.prototype.overrideDefaultForm = async function () {
   if (PACER.hasFilingCookie(document.cookie)) {
-    let button = createRecapButtonForFilers(
-      'Accept Charges and RECAP Document'
-    );
+    let button = createRecapButtonForFilers('Accept Charges and RECAP Document');
     let spinner = createRecapSpinner();
     button.addEventListener('click', (event) => {
       event.preventDefault();
@@ -1192,9 +1089,7 @@ AppellateDelegate.prototype.handleCombinedPdfPageView = async function () {
   // page content. To ensure an accurate count, we filter out nodes with more
   // than 3 child elements, as a full page container would likely have more
   // content.
-  let transactionReceiptTables = Array.from(
-    document.querySelectorAll('center')
-  ).filter((row) => row.childElementCount <= 3);
+  let transactionReceiptTables = Array.from(document.querySelectorAll('center')).filter((row) => row.childElementCount <= 3);
   if (transactionReceiptTables.length === 0) return;
 
   // In appellate courts, we don't rely on an exclusion list like lower courts.
@@ -1207,21 +1102,13 @@ AppellateDelegate.prototype.handleCombinedPdfPageView = async function () {
   // documents listed in the URL (`includeList`). If either count is greater
   // than 1, it indicates multiple documents are present. In this case, display
   // a warning message.
-  if (
-    transactionReceiptTables.length > 1 ||
-    (includeList && includeList.length > 1)
-  ) {
+  if (transactionReceiptTables.length > 1 || (includeList && includeList.length > 1)) {
     const warning = combinedPdfWarning();
     document.body.appendChild(warning);
     return;
   }
 
-  this.docId = await checkSingleDocInCombinedPDFPage(
-    this.tabId,
-    this.court,
-    this.docId,
-    true
-  );
+  this.docId = await checkSingleDocInCombinedPDFPage(this.tabId, this.court, this.docId, true);
   // If no pacer_doc_id is available, exit this block to prevent unnecessary
   // page modifications intended for PDF retrieval.
   if (!this.docId) return;
@@ -1230,11 +1117,7 @@ AppellateDelegate.prototype.handleCombinedPdfPageView = async function () {
 
   // When we receive the message from the above submit method, submit the form
   // via XHR so we can get the document before the browser does.
-  window.addEventListener(
-    'message',
-    this.onDocumentViewSubmit.bind(this),
-    false
-  );
+  window.addEventListener('message', this.onDocumentViewSubmit.bind(this), false);
 };
 
 // If this page offers a single document, intercept navigation to the document
@@ -1242,11 +1125,7 @@ AppellateDelegate.prototype.handleCombinedPdfPageView = async function () {
 AppellateDelegate.prototype.handleSingleDocumentPageView = async function () {
   await this.overrideDefaultForm();
 
-  this.pacer_case_id = await APPELLATE.getCaseId(
-    this.tabId,
-    this.queryParameters,
-    this.docId
-  );
+  this.pacer_case_id = await APPELLATE.getCaseId(this.tabId, this.queryParameters, this.docId);
 
   // Ensure a valid pacer_doc_id before proceeding.
   let input = document.querySelector('input[name=dls_id]');
@@ -1269,11 +1148,7 @@ AppellateDelegate.prototype.handleSingleDocumentPageView = async function () {
 
   // When we receive the message from the above submit method, submit the form
   // via XHR so we can get the document before the browser does.
-  window.addEventListener(
-    'message',
-    this.onDocumentViewSubmit.bind(this),
-    false
-  );
+  window.addEventListener('message', this.onDocumentViewSubmit.bind(this), false);
 
   let clCourt = PACER.convertToCourtListenerCourt(this.court);
   // submit fetch request through background worker
@@ -1286,12 +1161,8 @@ AppellateDelegate.prototype.handleSingleDocumentPageView = async function () {
   });
   if (docData.Error) return;
 
-  console.info(
-    'RECAP: Got results from API. Processing results to insert banner'
-  );
-  let result = docData.results.filter(
-    (obj) => obj.pacer_doc_id == this.docId
-  )[0];
+  console.info('RECAP: Got results from API. Processing results to insert banner');
+  let result = docData.results.filter((obj) => obj.pacer_doc_id == this.docId)[0];
   if (!result) return;
 
   insertAvailableDocBanner(result.filepath_local, 'body');
@@ -1300,10 +1171,7 @@ AppellateDelegate.prototype.handleSingleDocumentPageView = async function () {
 AppellateDelegate.prototype.onDocumentViewSubmit = async function (event) {
   // Security check to ensure message is from a PACER website.
   if (!PACER.getCourtFromUrl(event.origin)) {
-    console.warn(
-      'Received message from non PACER origin. This should only ' +
-        'happen when the extension is being abused by a bad actor.'
-    );
+    console.warn('Received message from non PACER origin. This should only ' + 'happen when the extension is being abused by a bad actor.');
     return;
   }
 
@@ -1330,10 +1198,7 @@ AppellateDelegate.prototype.onDocumentViewSubmit = async function (event) {
     if (this.queryParameters.get('recapAttNum')) {
       pdfData.att_number = this.queryParameters.get('recapAttNum');
     } else {
-      pdfData.att_number = await getAttachmentNumberFromPacerDocId(
-        this.tabId,
-        this.docId
-      );
+      pdfData.att_number = await getAttachmentNumberFromPacerDocId(this.tabId, this.docId);
     }
   }
 
@@ -1349,7 +1214,7 @@ AppellateDelegate.prototype.onDocumentViewSubmit = async function (event) {
   // can reuse this code to retrieve the PDF file and display it appropriately
   // for both page types.
   let queryString = new URLSearchParams(new FormData(form));
-  let url = new URL(form.action);;
+  let url = new URL(form.action);
   let method = form.method.toUpperCase();
   let options = {};
   if (method == 'GET') {
@@ -1357,39 +1222,20 @@ AppellateDelegate.prototype.onDocumentViewSubmit = async function (event) {
     queryString.forEach((value, key) => url.searchParams.append(key, value));
   } else {
     options['method'] = method;
-    options['headers'] = {
+    ((options['headers'] = {
       'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    options['body'] = queryString.toString();
+    }),
+      (options['body'] = queryString.toString()));
   }
   const resp = await window.fetch(url, options);
   let helperMethod = handleDocFormResponse.bind(this);
-  helperMethod(
-    resp.headers.get('Content-Type'),
-    await resp.blob(),
-    null,
-    previousPageHtml,
-    pdfData
-  );
+  helperMethod(resp.headers.get('Content-Type'), await resp.blob(), null, previousPageHtml, pdfData);
 };
 
 // Given the HTML for a page with an <iframe> in it, downloads the PDF
 // document in the iframe, displays it in the browser, and also
 // uploads the PDF document to RECAP.
-AppellateDelegate.prototype.showPdfPage = async function (
-  html,
-  previousPageHtml,
-  document_number,
-  attachment_number,
-  docket_number
-) {
+AppellateDelegate.prototype.showPdfPage = async function (html, previousPageHtml, document_number, attachment_number, docket_number) {
   let helperMethod = showAndUploadPdf.bind(this);
-  await helperMethod(
-    html,
-    previousPageHtml,
-    document_number,
-    attachment_number,
-    docket_number,
-    this.docId
-  );
+  await helperMethod(html, previousPageHtml, document_number, attachment_number, docket_number, this.docId);
 };

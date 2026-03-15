@@ -10,8 +10,7 @@ import { buildFormData, sources, authHeader, jsonHeader } from './recap.js';
 //
 // **Returns:**
 //  - A string representing the complete CourtListener API URL.
-const courtListenerURL = (suffix) =>
-  'https://www.courtlistener.com/api/rest/v4/' + suffix + '/';
+const courtListenerURL = (suffix) => 'https://www.courtlistener.com/api/rest/v4/' + suffix + '/';
 
 // Encodes Search Parameters for GET Requests
 //
@@ -27,9 +26,7 @@ const courtListenerURL = (suffix) =>
 //  - A string representing the complete URL with encoded search parameters.
 const searchParamsURL = ({ base, params }) => {
   const url = new URL(base);
-  Object.keys(params).forEach((key) =>
-    url.searchParams.append(key, params[key])
-  );
+  Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
   return url.toString();
 };
 

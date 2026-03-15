@@ -63,13 +63,13 @@ function updateNamingStyle(args) {
 }
 
 function handle_storage_changes(changed_args) {
-  const change_handler = function(options){
+  const change_handler = function (options) {
     // add other functions to process options changes here.
     updateNamingStyle(options);
   };
 
   if (changed_args && changed_args.options) {
-    change_handler({options: changed_args.options.newValue});
+    change_handler({ options: changed_args.options.newValue });
   } else {
     // if this gets called outside of the listener, pull the options
     // directly instead and invoke the change_handler
@@ -83,22 +83,22 @@ if (navigator.userAgent.indexOf('Chrome') < 0) {
   external_pdf.classList.remove('hidden');
 }
 
-if (/Firefox/.test(navigator.userAgent) && !/Seamonkey/.test(navigator.userAgent)){
+if (/Firefox/.test(navigator.userAgent) && !/Seamonkey/.test(navigator.userAgent)) {
   // Detect firefox engine
-  let firefox_button = document.getElementById('firefox_store_button')
-  firefox_button.classList.remove('hidden')
+  let firefox_button = document.getElementById('firefox_store_button');
+  firefox_button.classList.remove('hidden');
 }
 
-if (/Safari/.test(navigator.userAgent) && !/Chrome|Chromium/.test(navigator.userAgent)){
+if (/Safari/.test(navigator.userAgent) && !/Chrome|Chromium/.test(navigator.userAgent)) {
   // Detect Safari engine
-  let safari_button = document.getElementById('safari_store_button')
-  safari_button.classList.remove('hidden')
+  let safari_button = document.getElementById('safari_store_button');
+  safari_button.classList.remove('hidden');
 }
 
-if (/Chrome|Edg./.test(navigator.userAgent) && !/Chromium/.test(navigator.userAgent)){
+if (/Chrome|Edg./.test(navigator.userAgent) && !/Chromium/.test(navigator.userAgent)) {
   // Detect Chrome engine
-  let chrome_button = document.getElementById('chrome_store_button')
-  chrome_button.classList.remove('hidden')
+  let chrome_button = document.getElementById('chrome_store_button');
+  chrome_button.classList.remove('hidden');
 }
 
 load_options();
@@ -109,24 +109,26 @@ for (let i = 0; i < inputs.length; i++) {
 chrome.storage.onChanged.addListener(handle_storage_changes);
 
 // Show or hide the receipts warning
-chrome.tabs.query({active: true, currentWindow: true}, showHideReceiptsWarning);
-function showHideReceiptsWarning (tabs){
-  chrome.cookies.get({
-    url: tabs[0].url,
-    name: 'PacerPref'
-  }, function (pref_cookie) {
-    if (pref_cookie) {
-      let disabled_el = document.getElementById('receipts_disabled');
-      if (pref_cookie.value.match(/receipt=N/)) {
-        // Receipts are disabled. Show the warning.
-        disabled_el.classList.remove('hidden');
-      } else {
-        disabled_el.className += ' hidden';
+chrome.tabs.query({ active: true, currentWindow: true }, showHideReceiptsWarning);
+function showHideReceiptsWarning(tabs) {
+  chrome.cookies.get(
+    {
+      url: tabs[0].url,
+      name: 'PacerPref',
+    },
+    function (pref_cookie) {
+      if (pref_cookie) {
+        let disabled_el = document.getElementById('receipts_disabled');
+        if (pref_cookie.value.match(/receipt=N/)) {
+          // Receipts are disabled. Show the warning.
+          disabled_el.classList.remove('hidden');
+        } else {
+          disabled_el.className += ' hidden';
+        }
       }
     }
-  });
+  );
 }
-
 
 (function () {
   let ver = document.getElementById('version');

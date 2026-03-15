@@ -1,8 +1,6 @@
 import { getCourtFromUrl } from './url_and_cookie_helpers.js';
 
-let isSafari =
-  /Safari/.test(navigator.userAgent) &&
-  !/Chrome|Chromium/.test(navigator.userAgent);
+let isSafari = /Safari/.test(navigator.userAgent) && !/Chrome|Chromium/.test(navigator.userAgent);
 let executionWorld = isSafari ? 'MAIN' : chrome.scripting.ExecutionWorld.MAIN;
 
 export function chooseVariant(details) {
@@ -37,43 +35,37 @@ export function executeScripts(tabId, injectDetailsArray) {
 
 export async function injectContentScript(tabId, status, url) {
   if (status == 'complete' && getCourtFromUrl(url)) {
-    chrome.tabs.sendMessage(
-      tabId,
-      { message: 'content_script_status' },
-      async function (msg) {
-        if (chrome.runtime.lastError) {
-          console.info('RECAP: Content scripts are not loaded yet');
-        }
-        msg = msg || {};
-        if (msg.status != 'loaded') {
-          console.info('RECAP: Injecting content scripts');
-          executeScripts(tabId, [
-            { file: 'InjectManager.js' },
-            { file: 'assets/js/jquery.js' },
-            { file: 'assets/js/FileSaver.js' },
-            { file: 'assets/js/bootstrap.bundle.js' },
-            { file: 'action_button.js' },
-            { file: 'pdf_upload.js' },
-            { file: 'utils.js' },
-            { file: 'pacer.js' },
-            { file: 'content_delegate.js' },
-            { file: 'appellate/utils.js' },
-            { file: 'appellate/appellate.js' },
-            { file: 'utils/fetch.js' },
-            { file: 'utils/notifier.js' },
-            { file: 'content.js' },
-          ]);
-        }
+    chrome.tabs.sendMessage(tabId, { message: 'content_script_status' }, async function (msg) {
+      if (chrome.runtime.lastError) {
+        console.info('RECAP: Content scripts are not loaded yet');
       }
-    );
+      msg = msg || {};
+      if (msg.status != 'loaded') {
+        console.info('RECAP: Injecting content scripts');
+        executeScripts(tabId, [
+          { file: 'InjectManager.js' },
+          { file: 'assets/js/jquery.js' },
+          { file: 'assets/js/FileSaver.js' },
+          { file: 'assets/js/bootstrap.bundle.js' },
+          { file: 'action_button.js' },
+          { file: 'pdf_upload.js' },
+          { file: 'utils.js' },
+          { file: 'pacer.js' },
+          { file: 'content_delegate.js' },
+          { file: 'appellate/utils.js' },
+          { file: 'appellate/appellate.js' },
+          { file: 'utils/fetch.js' },
+          { file: 'utils/notifier.js' },
+          { file: 'content.js' },
+        ]);
+      }
+    });
   }
 }
 
 export function showNotificationTab(details) {
   // Show some kind of notification tab to the user after install/upgrade.
-  console.debug(
-    'RECAP: showing install/upgrade notification if ' + 'version matches'
-  );
+  console.debug('RECAP: showing install/upgrade notification if ' + 'version matches');
   let currentVersion = chrome.runtime.getManifest().version;
   if (details.reason === 'update' && currentVersion === '1.2.3') {
     // This version is when we pushed for donations. Show that page.
@@ -117,10 +109,7 @@ export function getAndStoreMetaData(req, sender, sendResponse) {
     // global scope. Rather than traversing the DOM or inspecting framework
     // internals, we read directly from this object to efficiently capture the
     // data needed for RECAP.
-    sessionStorage.setItem(
-      'recapDocViewModel',
-      JSON.stringify(window.showDocViewModel)
-    );
+    sessionStorage.setItem('recapDocViewModel', JSON.stringify(window.showDocViewModel));
     return true;
   };
   chrome.scripting
@@ -139,8 +128,7 @@ export function getDocumentDataFromDownloadModal(req, sender, sendResponse) {
       // ShowDocPageInitializer -> DocumentModalManager -> currentComponent.
       // chain currentComponent holds the DownloadConfirmation object that was
       // created when the user clicked a document link in the docket.
-      const component =
-        window.showDocPageInitializer.modalManager.currentComponent;
+      const component = window.showDocPageInitializer.modalManager.currentComponent;
 
       const detail = {
         // The docket entry ID that triggered the modal. This is the unique
@@ -156,10 +144,7 @@ export function getDocumentDataFromDownloadModal(req, sender, sendResponse) {
       // Store the result in sessionStorage so it can be read back by
       // the content scripts. Using sessionStorage as a bridge between
       // the page context and the extension context.
-      sessionStorage.setItem(
-        'recapDownloadDocumentData',
-        JSON.stringify(detail)
-      );
+      sessionStorage.setItem('recapDownloadDocumentData', JSON.stringify(detail));
     } catch (e) {
       // If the modal isn't open or the component chain is unavailable,
       // store an error result instead.
@@ -189,9 +174,7 @@ export function overwriteSubmitMethod(req, sender, sendResponse) {
       this.id = 'form' + new Date().getTime();
       // Gets a reference to the custom button for users with
       // filing permissions.
-      let filerButton = document.getElementsByClassName(
-        'recap-bttn-for-filers'
-      );
+      let filerButton = document.getElementsByClassName('recap-bttn-for-filers');
       // Check if there are any buttons found and if the button hasn't been
       // clicked yet (doesn't have the 'clicked' attribute).
       if (filerButton.length && !filerButton[0].hasAttribute('clicked')) {

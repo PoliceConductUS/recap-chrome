@@ -13,12 +13,9 @@
 //  rejects if the response is null.
 function dispatchBackgroundNotifier({ action, title, message }) {
   return new Promise((resolve, reject) =>
-    chrome.runtime.sendMessage(
-      { message: 'backgroundNotifier', notifier: { action, title, message } },
-      (res) => {
-        if (res == null) reject('Response cannot be null');
-        resolve(res);
-      }
-    )
+    chrome.runtime.sendMessage({ message: 'backgroundNotifier', notifier: { action, title, message } }, (res) => {
+      if (res == null) reject('Response cannot be null');
+      resolve(res);
+    })
   );
 }

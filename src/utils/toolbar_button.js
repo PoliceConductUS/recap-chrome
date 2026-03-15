@@ -14,11 +14,7 @@
 
 // -------------------------------------------------------------------------
 // Toolbar button for RECAP (or "browser action" in Chrome parlance).
-import {
-  areTransactionReceiptsDisabled,
-  getCourtFromUrl,
-  isACMSWebsite,
-} from './url_and_cookie_helpers.js';
+import { areTransactionReceiptsDisabled, getCourtFromUrl, isACMSWebsite } from './url_and_cookie_helpers.js';
 
 export function getTabById(tabId, cb) {
   chrome.tabs.get(tabId, cb);
@@ -39,10 +35,7 @@ export function updateToolbarButton(tab) {
       setDefaultOptions({});
     }
 
-    if (
-      'dismiss_news_badge' in items['options'] &&
-      items['options']['dismiss_news_badge']
-    ) {
+    if ('dismiss_news_badge' in items['options'] && items['options']['dismiss_news_badge']) {
       chrome.action.setBadgeText({ text: '' });
     } else {
       chrome.action.setBadgeText({ text: '1' });
@@ -78,8 +71,8 @@ export function updateToolbarButton(tab) {
       } else if (isACMSWebsite(tab.url)) {
         // ACMS website. Show warning.
         setTitleIcon('ACMS has partial support in this version', {
-          '19': 'assets/images/warning-19.png',
-          '38': 'assets/images/warning-38.png'
+          19: 'assets/images/warning-19.png',
+          38: 'assets/images/warning-38.png',
         });
       } else {
         // It's a valid PACER URL. Therefore either show the nice blue icon or
@@ -114,10 +107,7 @@ export function setDefaultOptions(details) {
   // Set options to their default values.
   console.debug('RECAP: Setting default options after install/upgrade.');
   chrome.storage.local.get('options', function (items) {
-    console.debug(
-      'RECAP: Attempted to get options key from local ' +
-        `storage. Got: ${items}`
-    );
+    console.debug('RECAP: Attempted to get options key from local ' + `storage. Got: ${items}`);
     let defaults = {
       external_pdf: false,
       recap_enabled: true,
@@ -134,9 +124,7 @@ export function setDefaultOptions(details) {
       saveOptionsAndUpdateToolbar(defaults);
       console.debug('RECAP: Set the defaults on new install successfully.');
     } else {
-      console.debug(
-        'RECAP: Existing install. Attempting to set new ' + 'defaults, if any'
-      );
+      console.debug('RECAP: Existing install. Attempting to set new ' + 'defaults, if any');
 
       // it's weird that we have a `recap_disabled` option
       // when it should be `recap_enabled`.

@@ -6,15 +6,14 @@ describe('The PACER module', function () {
   const singleDocUrl = 'https://ecf.canb.uscourts.gov/doc1/034031424909';
   const singleDocAudioUrl = 'https://ecf.canb.audio.uscourts.gov/doc1/034031424909';
   const docketQueryUrl = 'https://ecf.canb.uscourts.gov/cgi-bin/' + 'HistDocQry.pl?531316';
-  const docketQueryUrlFromAppellate =
-    'https://ecf.canb.uscourts.gov/cgi-bin/' + 'DktRpt.pl?caseNumber=2:16-cv-01129-RFB-DJA';
-  const docketQueryUrlWithMultiParameter =
-    'https://ecf.canb.uscourts.gov/cgi-bin/' + 'DktRpt.pl?caseNumber=1:17-cv-10577&caseId=0';
+  const docketQueryUrlFromAppellate = 'https://ecf.canb.uscourts.gov/cgi-bin/' + 'DktRpt.pl?caseNumber=2:16-cv-01129-RFB-DJA';
+  const docketQueryUrlWithMultiParameter = 'https://ecf.canb.uscourts.gov/cgi-bin/' + 'DktRpt.pl?caseNumber=1:17-cv-10577&caseId=0';
   const appellateDocumentUrl = 'https://ecf.ca2.uscourts.gov/docs1/00205695758';
 
   const AcmsDocketUrl = 'https://ca9-showdoc.azurewebsites.us/23-2081';
   const AcmsDocumentUrl = 'https://ca9-showdoc.azurewebsites.us/download-confirmation/c61cb56b-9a5c-ee11-be6e-001dd8087d6a?loadEntry=1';
-  const EcfCaseQueryAcmsCaseUrl = 'https://ecf.ca9.uscourts.gov/n/beam/servlet/TransportRoom?servlet=CaseQuery.jsp&cnthd=1234567890&caseid=1007067&csnum1=23-2081&shorttitle=International+Brotherhood+of+Teamsters+v.+National+Labor+Relations+Board';
+  const EcfCaseQueryAcmsCaseUrl =
+    'https://ecf.ca9.uscourts.gov/n/beam/servlet/TransportRoom?servlet=CaseQuery.jsp&cnthd=1234567890&caseid=1007067&csnum1=23-2081&shorttitle=International+Brotherhood+of+Teamsters+v.+National+Labor+Relations+Board';
   const nonAcmsAzureGovUrl = 'https://dc-ecosproduction.azurewebsites.us/login.aspx';
   const AcmsFilingUrl = 'https://ca9-portal.powerappsportals.us/';
   const AcmsFilingTestUrl = 'https://ca9-acms-pcx.powerappsportals.us/';
@@ -95,7 +94,6 @@ describe('The PACER module', function () {
     it('ignores a Fedcourts non-court URL', function () {
       expect(PACER.getCourtFromUrl(FedcourtsBogusUrl)).toBe(null);
     });
-
   });
 
   describe('convertToCourtListenerCourt', function () {
@@ -116,8 +114,7 @@ describe('The PACER module', function () {
       expect(PACER.isDocumentUrl(appellateDocumentUrl)).toBe(true);
     });
 
-    const showDocUrl =
-      'https://ecf.cacd.uscourts.gov/cgi-bin/show_doc.pl?' + 'caseid=560453&de_seq_num=24&dm_id=15521444&doc_num=7';
+    const showDocUrl = 'https://ecf.cacd.uscourts.gov/cgi-bin/show_doc.pl?' + 'caseid=560453&de_seq_num=24&dm_id=15521444&doc_num=7';
 
     it('matches a valid show_doc document URL', function () {
       expect(PACER.isDocumentUrl(showDocUrl)).toBe(true);
@@ -141,8 +138,7 @@ describe('The PACER module', function () {
       expect(PACER.isDoc1Url(appellateDocumentUrl)).toBe(true);
     });
 
-    const showDocUrl =
-      'https://ecf.cacd.uscourts.gov/cgi-bin/show_doc.pl?' + 'caseid=560453&de_seq_num=24&dm_id=15521444&doc_num=7';
+    const showDocUrl = 'https://ecf.cacd.uscourts.gov/cgi-bin/show_doc.pl?' + 'caseid=560453&de_seq_num=24&dm_id=15521444&doc_num=7';
 
     it('returns false for a valid show_doc document URL', function () {
       expect(PACER.isDoc1Url(showDocUrl)).toBe(false);
@@ -289,8 +285,7 @@ describe('The PACER module', function () {
     describe('for documents with a combined size over size limit', function () {
       beforeEach(function () {
         let main_div = InputContainer();
-        main_div.innerHTML =
-          'You must view each document individually because the combined PDF would be over the 50 MB size limit.';
+        main_div.innerHTML = 'You must view each document individually because the combined PDF would be over the 50 MB size limit.';
         document.body.appendChild(main_div);
         document.getElementById = jasmine.createSpy('getElementById').and.callFake((id) => {
           if (id != 'cmecfMainContent') {
@@ -583,10 +578,8 @@ describe('The PACER module', function () {
   });
 
   describe('hasFilingCookie', function () {
-    const filingAccountCookie =
-      'PacerSession=B7yuvmcj2F...9p5nDzEXsHE; ' + 'isFilingAccount=true';
-    const nonFilingAccountCookie =
-      'PacerUser=B7yuvmcj2F...9p5nDzEXsHE; ' + 'PacerPref=receipt=Y';
+    const filingAccountCookie = 'PacerSession=B7yuvmcj2F...9p5nDzEXsHE; ' + 'isFilingAccount=true';
+    const nonFilingAccountCookie = 'PacerUser=B7yuvmcj2F...9p5nDzEXsHE; ' + 'PacerPref=receipt=Y';
     const nonLoggedInCookie = 'PacerSession=unvalidated; PacerPref=receipt=Y';
     const nonsenseCookie = 'Foo=barbaz; Baz=bazbar; Foobar=Foobar';
 
@@ -623,9 +616,7 @@ describe('The PACER module', function () {
 
   describe('isIQuerySummaryURL', function () {
     it('returns true for an iquery url with query string', function () {
-      expect(PACER.isIQuerySummaryURL('https://ecf.mied.uscourts.gov/cgi-bin/iquery.pl?184987019171527-L_1_0-1')).toBe(
-        true
-      );
+      expect(PACER.isIQuerySummaryURL('https://ecf.mied.uscourts.gov/cgi-bin/iquery.pl?184987019171527-L_1_0-1')).toBe(true);
     });
 
     it('returns false for an iquery url without query string', function () {

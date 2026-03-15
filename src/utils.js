@@ -32,30 +32,20 @@ const getItemsFromStorage = (key) =>
 
 const saveItemToStorage = (dataObj) =>
   new Promise((resolve, reject) =>
-    chrome.storage.local.set(dataObj, () =>
-      resolve(
-        console.log(
-          `RECAP: Item saved in storage at tabId: ${Object.keys(dataObj)[0]}`
-        )
-      )
-    )
+    chrome.storage.local.set(dataObj, () => resolve(console.log(`RECAP: Item saved in storage at tabId: ${Object.keys(dataObj)[0]}`)))
   );
 
 const destroyTabStorage = (key) => {
   chrome.storage.local.get(null, (store) => {
     if (store[key]) {
-      chrome.storage.local.remove(key.toString(), () =>
-        console.log(`Removed item from storage with key ${key}`)
-      );
+      chrome.storage.local.remove(key.toString(), () => console.log(`Removed item from storage with key ${key}`));
     }
   });
 };
 // initialize the store with an empty object
 const getTabIdForContentScript = () =>
   new Promise((resolve) => {
-    chrome.runtime.sendMessage({ message: 'requestTabId' }, (msg) =>
-      resolve(msg)
-    );
+    chrome.runtime.sendMessage({ message: 'requestTabId' }, (msg) => resolve(msg));
   });
 
 // object takes shape of { [tabId]: { ...data } }
@@ -120,10 +110,7 @@ function formatRelativeTime(date, now = new Date()) {
 
   for (const [unit, secondsPerUnit] of units) {
     if (Math.abs(elapsedSeconds) >= secondsPerUnit) {
-      return relativeTimeFormatter.format(
-        Math.round(elapsedSeconds / secondsPerUnit),
-        unit
-      );
+      return relativeTimeFormatter.format(Math.round(elapsedSeconds / secondsPerUnit), unit);
     }
   }
 
@@ -152,7 +139,6 @@ function ensureRelativeTimeUpdates() {
 
   relativeTimeRefreshHandle = window.setInterval(refreshRelativeTimes, 60000);
 }
-
 
 const blobToDataURL = (blob) => {
   return new Promise((resolve, reject) => {
@@ -208,9 +194,7 @@ const recapAlertButton = (court, pacerCaseId, isActive) => {
   }
 
   const icon = isActive ? 'icon' : 'grey';
-  const text = isActive
-    ? 'Create an Alert for this Case on RECAP'
-    : 'Alerts not yet Supported for this Docket';
+  const text = isActive ? 'Create an Alert for this Case on RECAP' : 'Alerts not yet Supported for this Docket';
 
   const url = new URL('https://www.courtlistener.com/alert/docket/new/');
   url.searchParams.append('pacer_case_id', pacerCaseId);
@@ -234,9 +218,7 @@ const recapAddLatestFilingButton = (result) => {
 
   const anchor = document.createElement('a');
   anchor.classList.add('recap-filing-button');
-  anchor.title =
-    'Autofill the form to get the latest content not yet in RECAP, omitting ' +
-    'parties and member cases.';
+  anchor.title = 'Autofill the form to get the latest content not yet in RECAP, omitting ' + 'parties and member cases.';
   anchor.dataset.dateFrom = formatted_date;
   anchor.href = '#';
 
@@ -283,9 +265,7 @@ const recapBanner = (result) => {
     time.dateTime = parsedDate.toISOString();
   }
 
-  let message =
-    'View and Search this docket as of ' +
-    `${time.outerHTML} for free from RECAP`;
+  let message = 'View and Search this docket as of ' + `${time.outerHTML} for free from RECAP`;
   let innerDiv = makeMessageForBanners(message);
 
   const small = document.createElement('small');
@@ -307,10 +287,9 @@ const recapEmailBanner = (css_class = 'recap-email-banner') => {
 
   const anchor = document.createElement('a');
   anchor.target = '_blank';
-  anchor.href = `https://www.courtlistener.com/help/recap/email/`;
+  anchor.href = 'https://www.courtlistener.com/help/recap/email/';
 
-  let message =
-    'Use @recap.email to automatically contribute all your cases to RECAP.';
+  let message = 'Use @recap.email to automatically contribute all your cases to RECAP.';
   let innerDiv = makeMessageForBanners(message);
 
   anchor.appendChild(innerDiv);
@@ -379,7 +358,7 @@ const combinedPdfWarning = () => {
   return outerDiv;
 };
 
-async function getDocToCasesFromStorage(tabId){
+async function getDocToCasesFromStorage(tabId) {
   const tabStorage = await getItemsFromStorage(tabId);
   return tabStorage && tabStorage.docsToCases;
 }
@@ -400,8 +379,7 @@ async function getPacerCaseIdFromPacerDocId(tabId, pacer_doc_id) {
 // Retrieves the attachment number using the pacer_doc_id
 async function getAttachmentNumberFromPacerDocId(tabId, pacer_doc_id) {
   const tabStorage = await getItemsFromStorage(tabId);
-  const docsToAttachmentNumbers =
-    tabStorage && tabStorage.docsToAttachmentNumbers;
+  const docsToAttachmentNumbers = tabStorage && tabStorage.docsToAttachmentNumbers;
   if (!docsToAttachmentNumbers) return;
 
   const attachmentNumber = docsToAttachmentNumbers[pacer_doc_id];
@@ -431,15 +409,12 @@ async function getPacerDocIdFromPartialId(tabId, partialId) {
 // tab's storage. It then filters out the Pacer document IDs using the array of
 // the attachment IDs to exclude. If there's only one remaining Pacer document
 // ID, it's returned. Otherwise, undefined is returned.
-async function getPacerDocIdFromExcludeList(tabId, excludeList){
+async function getPacerDocIdFromExcludeList(tabId, excludeList) {
   const docsToCases = await getDocToCasesFromStorage(tabId);
   if (!docsToCases) return;
 
   var pacerDocIds = Object.keys(docsToCases);
-  excludeList.forEach(
-    (attachmentId) =>
-      (pacerDocIds = pacerDocIds.filter((key) => !key.includes(attachmentId)))
-  );
+  excludeList.forEach((attachmentId) => (pacerDocIds = pacerDocIds.filter((key) => !key.includes(attachmentId))));
   if (pacerDocIds.length > 1) return;
   return PACER.cleanPacerDocId(pacerDocIds[0]);
 }
@@ -473,12 +448,7 @@ function createRecapSpinner(hidden = true) {
 // the Recap archive. The document is identified by its PACER document ID.
 // If the document is found, it inserts a banner to inform the user of its
 // availability.
-async function checkSingleDocInCombinedPDFPage(
-  tabId,
-  court,
-  docId,
-  isAppellate = false
-) {
+async function checkSingleDocInCombinedPDFPage(tabId, court, docId, isAppellate = false) {
   let clCourt = PACER.convertToCourtListenerCourt(court);
   const urlParams = new URLSearchParams(window.location.search);
   if (isAppellate) {
@@ -514,13 +484,8 @@ async function checkSingleDocInCombinedPDFPage(
     },
   });
   if (!recapLinks.results.length) return docId;
-  console.info(
-    'RECAP: Got results from API. Processing results to insert link'
-  );
-  let result = recapLinks.results.filter(
-    (doc) => doc.pacer_doc_id === docId,
-    this
-  );
+  console.info('RECAP: Got results from API. Processing results to insert link');
+  let result = recapLinks.results.filter((doc) => doc.pacer_doc_id === docId, this);
   if (!result.length) return docId;
 
   let targetDiv = isAppellate ? 'body' : '#cmecfMainContent';

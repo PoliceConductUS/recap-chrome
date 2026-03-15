@@ -15,12 +15,9 @@
 //  - A Promise that resolves with the response from the background worker.
 function dispatchBackgroundFetch({ action, data }) {
   return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(
-      { message: 'backgroundFetch', fetch: { action, data } },
-      (res) => {
-        resolve(res);
-      }
-    );
+    chrome.runtime.sendMessage({ message: 'backgroundFetch', fetch: { action, data } }, (res) => {
+      resolve(res);
+    });
   });
 }
 

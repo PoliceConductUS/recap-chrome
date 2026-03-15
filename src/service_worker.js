@@ -1,9 +1,4 @@
-import {
-  getTabById,
-  saveOptionsAndUpdateToolbar,
-  setDefaultOptions,
-  updateToolbarButton,
-} from './utils/toolbar_button.js';
+import { getTabById, saveOptionsAndUpdateToolbar, setDefaultOptions, updateToolbarButton } from './utils/toolbar_button.js';
 import {
   chooseVariant,
   injectContentScript,
@@ -46,7 +41,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     overwriteSubmitMethod(msg, sender, sendResponse);
     return true;
   }
-  if (msg.message === 'fetchAcmsDocumentUrl'){
+  if (msg.message === 'fetchAcmsDocumentUrl') {
     getDocumentURL(msg, sender, sendResponse);
     return true;
   }

@@ -24,8 +24,7 @@ export const jsonHeader = { 'Content-Type': 'application/json' };
 export function buildFormData(body) {
   let formData = new FormData();
   Object.keys(body).map((key) => formData.append(key, body[key]));
-  body.upload_type &&
-    formData.set('upload_type', UPLOAD_TYPES[body.upload_type]);
+  body.upload_type && formData.set('upload_type', UPLOAD_TYPES[body.upload_type]);
   return formData;
 }
 

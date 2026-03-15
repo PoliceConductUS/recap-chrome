@@ -1,4 +1,3 @@
-
 // Asynchronously checks the progress of the PDF link generation using a
 // provided URL and authorization token.
 // This function fetches data from the specified URL using a GET request with
@@ -15,8 +14,7 @@ async function checkProgress(url, token) {
 
   const data = await response.json();
 
-  if (!response.ok)
-    throw new Error(`Error attempting to fetch with checkProgress: ${data}`);
+  if (!response.ok) throw new Error(`Error attempting to fetch with checkProgress: ${data}`);
 
   return data;
 }
@@ -44,8 +42,7 @@ async function postData(url, token, body = {}) {
 
   const data = await response.json();
 
-  if (!response.ok)
-    throw new Error(`Error attempting to fetch with postData: ${data}`);
+  if (!response.ok) throw new Error(`Error attempting to fetch with postData: ${data}`);
 
   return data;
 }
@@ -69,11 +66,9 @@ async function postData(url, token, body = {}) {
 //  - If `condition` is false, it resolves the returned Promise immediately
 //    with the current `input` value, signifying the end of the loop.
 const promiseWhile = (input, condition, action) => {
-  const whilst = (input) =>
-    condition(input) ? action(input).then(whilst) : Promise.resolve(input);
+  const whilst = (input) => (condition(input) ? action(input).then(whilst) : Promise.resolve(input));
   return whilst(input);
 };
-
 
 // Use the ACMS API to retrieve the file GUID and compute the document URL
 export async function getDocumentURL(req, sender, sendResponse) {
@@ -104,8 +99,7 @@ export async function getDocumentURL(req, sender, sendResponse) {
           if (!newRuntimeStatus) reject('No runtime status was returned.');
 
           // Update the output variable if the job is completed
-          if (isCompleted(newRuntimeStatus))
-            output = response && response.output;
+          if (isCompleted(newRuntimeStatus)) output = response && response.output;
 
           resolve(newRuntimeStatus);
         })
@@ -115,12 +109,7 @@ export async function getDocumentURL(req, sender, sendResponse) {
     });
 
   // Use promiseWhile to keep checking the status until the job is completed
-  let fileGuid = await promiseWhile(
-    initialRuntimeStatus,
-    condition,
-    action
-  ).then((status) => output);
+  let fileGuid = await promiseWhile(initialRuntimeStatus, condition, action).then((status) => output);
   sendResponse(`${apiUrl}/GetMergedFile?fileGuid=${fileGuid}`);
   return true;
 }
-

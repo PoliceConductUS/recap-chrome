@@ -70,11 +70,10 @@ let APPELLATE = {
   // Returns true if this is a "Attachment page"
   isAttachmentPage: () => {
     let form = document.querySelector("form[name='dktEntry']");
-    if (form !== null)
-      return true;
-    let table = document.getElementsByTagName("table");
-    let header = table.length ? table[0].getElementsByTagName("th") : false;
-    return (header && header.length) ? header[0].textContent.includes('Documents are attached to this filing') : false;
+    if (form !== null) return true;
+    let table = document.getElementsByTagName('table');
+    let header = table.length ? table[0].getElementsByTagName('th') : false;
+    return header && header.length ? header[0].textContent.includes('Documents are attached to this filing') : false;
   },
 
   // Returns true if this is a "Download Confirmation page"
@@ -198,9 +197,7 @@ let APPELLATE = {
     let anchor = dataTable.querySelectorAll('a');
 
     if (anchor.length < 2) {
-      console.info(
-        "RECAP: no matching format was detected. There aren't enough anchors in the table that the extension found."
-      );
+      console.info("RECAP: no matching format was detected. There aren't enough anchors in the table that the extension found.");
       return;
     }
 
@@ -225,7 +222,7 @@ let APPELLATE = {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: query_string
+      body: query_string,
     });
     let requestHandler = handleFreeDocResponse.bind(target);
     requestHandler(resp.headers.get('Content-Type'), await resp.blob(), null);
@@ -239,11 +236,9 @@ let APPELLATE = {
     Array.from(nodeList).map((a) => {
       if (!PACER.isDoc1Url(a.href)) return;
 
-      let docNum =
-        PACER.getDocNumberFromAnchor(a) || queryParameters.get('recapDocNum');
+      let docNum = PACER.getDocNumberFromAnchor(a) || queryParameters.get('recapDocNum');
       let doDoc = PACER.parseDoDocPostURL(a.getAttribute('onclick'));
-      let pacerCaseId =
-        (doDoc && doDoc.case_id) || queryParameters.get('caseId');
+      let pacerCaseId = (doDoc && doDoc.case_id) || queryParameters.get('caseId');
       if (doDoc && doDoc.doc_id && pacerCaseId) {
         docsToCases[doDoc.doc_id] = pacerCaseId;
       }
@@ -299,7 +294,7 @@ let APPELLATE = {
 
       links.push(docId);
     });
-    return { links, docsToCases , docsToAttachmentNumbers};
+    return { links, docsToCases, docsToAttachmentNumbers };
   },
 
   // get the docId from the servlet parameter of the attachment page or the single doc page
@@ -355,14 +350,8 @@ let APPELLATE = {
     //  - doc_number
     //  - att_number
 
-    let dataFromAttachment =
-      /^Document: PDF Document \(Case: ([^']*), Document: (\d+)[-.]+(\d+)\)/.exec(
-        title_string
-      );
-    let dataFromSingleDoc =
-      /^Document: PDF Document \(Case: ([^']*), Document: (\d+)\)/.exec(
-        title_string
-      );
+    let dataFromAttachment = /^Document: PDF Document \(Case: ([^']*), Document: (\d+)[-.]+(\d+)\)/.exec(title_string);
+    let dataFromSingleDoc = /^Document: PDF Document \(Case: ([^']*), Document: (\d+)\)/.exec(title_string);
 
     if (!dataFromAttachment && !dataFromSingleDoc) {
       return null;
@@ -385,8 +374,7 @@ let APPELLATE = {
     //  - doc_number
     //  - att_number (if applicable).
     let search_string = $('td:contains(Case)').text();
-    let regex =
-      /Case: (?<docket_number>[^']*), Document: (?<doc_number>\d+)(-(?<att_number>\d+))?/;
+    let regex = /Case: (?<docket_number>[^']*), Document: (?<doc_number>\d+)(-(?<att_number>\d+))?/;
     let matches = regex.exec(search_string);
     // If no matches were found, return null.
     if (!matches) return null;
@@ -447,13 +435,10 @@ let APPELLATE = {
 
   fetchAcmsDocumentUrl: function (data) {
     return new Promise((resolve, reject) =>
-      chrome.runtime.sendMessage(
-        { message: 'fetchAcmsDocumentUrl', data: data },
-        (res) => {
-          if (res == null) reject('Response cannot be null');
-          resolve(res);
-        }
-      )
+      chrome.runtime.sendMessage({ message: 'fetchAcmsDocumentUrl', data: data }, (res) => {
+        if (res == null) reject('Response cannot be null');
+        resolve(res);
+      })
     );
   },
 
@@ -470,13 +455,10 @@ let APPELLATE = {
   // Sends message to background to fetch document data from download modal
   storeDocumentDataFromDownloadModal: () => {
     return new Promise((resolve, reject) =>
-      chrome.runtime.sendMessage(
-        { message: 'getDocumentDataFromDownloadModal' },
-        (res) => {
-          if (res == null) reject('Response cannot be null');
-          resolve(res);
-        }
-      )
+      chrome.runtime.sendMessage({ message: 'getDocumentDataFromDownloadModal' }, (res) => {
+        if (res == null) reject('Response cannot be null');
+        resolve(res);
+      })
     );
   },
 
@@ -524,9 +506,7 @@ let APPELLATE = {
       mergeScope: 'External',
       pagination: includePageNumbers,
       header: showPDFHeaderInput,
-      docketEntryDocuments: downloadData.docketEntryDocuments.map((data) =>
-        pdfItemMapping(data)
-      ),
+      docketEntryDocuments: downloadData.docketEntryDocuments.map((data) => pdfItemMapping(data)),
     };
   },
 
@@ -540,9 +520,7 @@ let APPELLATE = {
     let spinner = document.createElement('i');
     spinner.classList.add('mdi', 'mdi-spin', 'mdi-loading', 'mr-2');
     let spanText = document.createElement('span');
-    spanText.innerHTML =
-      'Download in progress for case number ' +
-      `${caseNumber}`;
+    spanText.innerHTML = 'Download in progress for case number ' + `${caseNumber}`;
 
     // Add a non-breaking space between spinner and text
     const space = document.createTextNode('\u00A0');

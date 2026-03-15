@@ -33,9 +33,7 @@ describe('The ContentDelegate class', () => {
   describe('attempts to download a zip file', () => {
     let nativeFetch;
     beforeEach(async () => {
-      const dataUrl = await blobToDataURL(
-        new Blob([new ArrayBuffer(1000), { type: 'application/zip' }])
-      );
+      const dataUrl = await blobToDataURL(new Blob([new ArrayBuffer(1000), { type: 'application/zip' }]));
       window.chrome = {
         storage: {
           local: {
@@ -61,27 +59,13 @@ describe('The ContentDelegate class', () => {
       nativeFetch = window.fetch;
       spyOn(window, 'fetch').and.callFake((url, options) => {
         const res = {};
-        res.status = jasmine
-          .createSpy()
-          .and.callFake(() => Promise.resolve('200'));
-        res.text = jasmine
-          .createSpy()
-          .and.callFake(() =>
-            Promise.resolve(
-              `<html><iframe src="http://dummylink.com"></iframe></html>`
-            )
-          );
-        res.json = jasmine
-          .createSpy()
-          .and.callFake(() => Promise.resolve({ result: true }));
-        res.blob = jasmine
-          .createSpy()
-          .and.callFake(() => Promise.resolve(blob));
+        res.status = jasmine.createSpy().and.callFake(() => Promise.resolve('200'));
+        res.text = jasmine.createSpy().and.callFake(() => Promise.resolve('<html><iframe src="http://dummylink.com"></iframe></html>'));
+        res.json = jasmine.createSpy().and.callFake(() => Promise.resolve({ result: true }));
+        res.blob = jasmine.createSpy().and.callFake(() => Promise.resolve(blob));
         return Promise.resolve(res);
       });
-      window.saveAs = jasmine
-        .createSpy('saveAs')
-        .and.callFake((blob, filename) => Promise.resolve(true));
+      window.saveAs = jasmine.createSpy('saveAs').and.callFake((blob, filename) => Promise.resolve(true));
       spyOn(window, 'addEventListener').and.callThrough();
     });
 
@@ -96,11 +80,7 @@ describe('The ContentDelegate class', () => {
       beforeEach(() => {
         document.querySelector = jasmine
           .createSpy('querySelector')
-          .and.callFake((id) =>
-            document.querySelectorAll(id).length
-              ? document.querySelectorAll(id)[0]
-              : null
-          );
+          .and.callFake((id) => (document.querySelectorAll(id).length ? document.querySelectorAll(id)[0] : null));
       });
 
       describe('it is not a downloadAllDocumentsPage', () => {
@@ -129,9 +109,7 @@ describe('The ContentDelegate class', () => {
             form.remove();
           }
           const scripts = [...document.getElementsByTagName('script')];
-          const script = scripts.find((script) =>
-            script.innerText.match(/^let\sforms/)
-          );
+          const script = scripts.find((script) => script.innerText.match(/^let\sforms/));
           if (script) {
             script.remove();
           }
@@ -161,34 +139,26 @@ describe('The ContentDelegate class', () => {
             form.remove();
           }
           const scripts = [...document.getElementsByTagName('script')];
-          const script = scripts.find((script) =>
-            script.innerText.match(/^let\sforms/)
-          );
+          const script = scripts.find((script) => script.innerText.match(/^let\sforms/));
           if (script) {
             script.remove();
           }
         });
 
         it('should contain a Download Documents Button', () => {
-          const button = document.querySelector(
-            'input[value="Download Documents"]'
-          );
+          const button = document.querySelector('input[value="Download Documents"]');
           expect(button).toBeTruthy();
         });
 
         it('the Download Documents button should have an onclick attribute', () => {
-          const button = document.querySelector(
-            'input[value="Download Documents"]'
-          );
+          const button = document.querySelector('input[value="Download Documents"]');
           const onclick = button.getAttribute('onclick');
           expect(onclick).toEqual(expectedOnclick);
         });
 
         it('should remove the onclick attribute from the form and input', () => {
           cd.handleZipFilePageView();
-          const input = document.querySelector(
-            'input[value="Download Documents"]'
-          );
+          const input = document.querySelector('input[value="Download Documents"]');
           expect(input.onclick).not.toBeTruthy();
         });
 
@@ -201,14 +171,10 @@ describe('The ContentDelegate class', () => {
 
     describe('onDownloadAllSubmit', function () {
       beforeEach(async () => {
-        dispatchBackgroundFetch = jasmine
-          .createSpy()
-          .and.callFake(fakeBackgroundFetch);
+        dispatchBackgroundFetch = jasmine.createSpy().and.callFake(fakeBackgroundFetch);
         dispatchBackgroundNotifier = jasmine.createSpy();
         spyOn(history, 'pushState').and.callFake((...args) => {});
-        document.getElementById = jasmine
-          .createSpy('getElementById')
-          .and.callFake((id) => document.querySelectorAll(`#${id}`)[0]);
+        document.getElementById = jasmine.createSpy('getElementById').and.callFake((id) => document.querySelectorAll(`#${id}`)[0]);
 
         mainContainer = document.createElement('div');
         mainContainer.id = 'cmecfMainContent';

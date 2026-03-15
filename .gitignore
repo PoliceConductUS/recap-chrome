@@ -7,3 +7,7 @@ coverage
 /.idea/
 .vscode/
 build/
+
+src/assets/js/FileSaver.js
+src/assets/js/jquery.js
+src/assets/js/moment.js

@@ -25,10 +25,10 @@
   },
   "homepage": "https://github.com/freelawproject/recap-chrome#readme",
   "dependencies": {
-    "bootstrap": "^5.3.8",
+    "bootstrap": "^4.6.2",
     "entr": "^0.0.0",
     "file-saver": "2.0.5",
-    "jquery": "~4.0.0",
+    "jquery": "~3.7.1",
     "web-ext": "^10.0.0"
   },
   "devDependencies": {
@@ -44,6 +44,9 @@
     "puppeteer": "^24.39.1",
     "vendor-copy": "^3.0.1",
     "whatwg-fetch": "^3.6.20"
+  },
+  "overrides": {
+    "yauzl": "3.2.1"
   },
   "vendorCopy": [
     {

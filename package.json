@@ -29,7 +29,6 @@
     "entr": "^0.0.0",
     "file-saver": "2.0.5",
     "jquery": "~4.0.0",
-    "moment": "~2.30.1",
     "web-ext": "^10.0.0"
   },
   "devDependencies": {
@@ -56,8 +55,8 @@
       "to": "src/assets/js/FileSaver.js"
     },
     {
-      "from": "node_modules/moment/moment.js",
-      "to": "src/assets/js/moment.js"
+      "from": "node_modules/bootstrap/dist/js/bootstrap.bundle.js",
+      "to": "src/assets/js/bootstrap.bundle.js"
     }
   ]
 }
